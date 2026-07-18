@@ -1,7 +1,5 @@
 package az.library.library.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.Set;
@@ -15,13 +13,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateBookRequest {
+public class UpdateBookRequest {
 
-    @NotBlank
     @Size(max = 300)
     private String title;
 
-    @NotBlank
     @Size(min = 10, max = 17)
     private String isbn;
 
@@ -40,7 +36,6 @@ public class CreateBookRequest {
 
     private Long publisherId;
 
-    @NotNull
     private Set<Long> authorIds;
 
     private Set<Long> categoryIds;
