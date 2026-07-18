@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UpdateBookCopyRequest {
 
-    @Size(max = 50)
+    @Size(max = 50, message = "Barkod nömrəsi maksimum 50 simvoldan ibarət ola bilər")
     private String barcode;
 
-    @Size(max = 100)
+    @Size(max = 100, message = "Raf yeri maksimum 100 simvoldan ibarət ola bilər")
     private String shelfLocation;
 
     private String condition;

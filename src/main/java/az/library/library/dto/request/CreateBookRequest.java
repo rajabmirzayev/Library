@@ -17,30 +17,30 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CreateBookRequest {
 
-    @NotBlank
-    @Size(max = 300)
+    @NotBlank(message = "Kitab adı boş ola bilməz")
+    @Size(max = 300, message = "Kitab adı maksimum 300 simvoldan ibarət ola bilər")
     private String title;
 
-    @NotBlank
-    @Size(min = 10, max = 17)
+    @NotBlank(message = "ISBN nömrəsi boş ola bilməz")
+    @Size(min = 10, max = 17, message = "ISBN nömrəsi 10-17 simvol aralığında olmalıdır")
     private String isbn;
 
     private Integer publicationYear;
 
-    @Size(max = 50)
+    @Size(max = 50, message = "Nəşr adı maksimum 50 simvoldan ibarət ola bilər")
     private String edition;
 
     private Integer pageCount;
 
-    @Size(max = 50)
+    @Size(max = 50, message = "Dil adı maksimum 50 simvoldan ibarət ola bilər")
     private String language;
 
-    @Size(max = 5000)
+    @Size(max = 5000, message = "Xülasə maksimum 5000 simvoldan ibarət ola bilər")
     private String summary;
 
     private Long publisherId;
 
-    @NotNull
+    @NotNull(message = "Müəllif seçilməsi məcburidir")
     private Set<Long> authorIds;
 
     private Set<Long> categoryIds;

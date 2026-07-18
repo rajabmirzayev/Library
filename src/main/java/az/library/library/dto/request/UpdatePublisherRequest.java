@@ -13,20 +13,20 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UpdatePublisherRequest {
 
-    @Size(max = 200)
+    @Size(max = 200, message = "Nəşriyyat adı maksimum 200 simvoldan ibarət ola bilər")
     private String name;
 
-    @Size(max = 500)
+    @Size(max = 500, message = "Ünvan maksimum 500 simvoldan ibarət ola bilər")
     private String address;
 
-    @Size(max = 20)
+    @Size(max = 20, message = "Telefon nömrəsi maksimum 20 simvoldan ibarət ola bilər")
     private String phone;
 
-    @Email
-    @Size(max = 150)
+    @Email(message = "Düzgün e-poçt ünvanı daxil edin")
+    @Size(max = 150, message = "E-poçt ünvanı maksimum 150 simvoldan ibarət ola bilər")
     private String email;
 
-    @Size(max = 200)
+    @Size(max = 200, message = "Vebsayt ünvanı maksimum 200 simvoldan ibarət ola bilər")
     private String website;
 
 }

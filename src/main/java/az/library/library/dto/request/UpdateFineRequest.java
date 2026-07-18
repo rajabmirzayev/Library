@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UpdateFineRequest {
 
-    @Positive
+    @Positive(message = "Cərimə məbləği müsbət olmalıdır")
     private BigDecimal amount;
 
     private String reason;

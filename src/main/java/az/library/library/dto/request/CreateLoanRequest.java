@@ -15,13 +15,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CreateLoanRequest {
 
-    @NotNull
+    @NotNull(message = "Kitab nüsxəsi seçilməsi məcburidir")
     private Long bookCopyId;
 
-    @NotNull
+    @NotNull(message = "Üzv seçilməsi məcburidir")
     private Long memberId;
 
-    @NotNull
+    @NotNull(message = "Qayıtma tarixi boş ola bilməz")
     private LocalDate dueDate;
 
 }

@@ -16,20 +16,20 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CreateAuthorRequest {
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Müəllifin adı boş ola bilməz")
+    @Size(max = 100, message = "Müəllifin adı maksimum 100 simvoldan ibarət ola bilər")
     private String firstName;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Müəllifin soyadı boş ola bilməz")
+    @Size(max = 100, message = "Müəllifin soyadı maksimum 100 simvoldan ibarət ola bilər")
     private String lastName;
 
-    @Size(max = 2000)
+    @Size(max = 2000, message = "Biografiya maksimum 2000 simvoldan ibarət ola bilər")
     private String biography;
 
     private LocalDate birthDate;
 
-    @Size(max = 100)
+    @Size(max = 100, message = "Milliyət adı maksimum 100 simvoldan ibarət ola bilər")
     private String nationality;
 
 }

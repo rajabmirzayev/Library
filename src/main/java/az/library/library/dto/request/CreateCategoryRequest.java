@@ -13,13 +13,14 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CreateCategoryRequest {
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Kateqoriya adı boş ola bilməz")
+    @Size(max = 100, message = "Kateqoriya adı maksimum 100 simvoldan ibarət ola bilər")
     private String name;
 
-    @Size(max = 500)
+    @Size(max = 500, message = "Təsvir maksimum 500 simvoldan ibarət ola bilər")
     private String description;
 
     private Long parentId;
+
 
 }

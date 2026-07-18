@@ -16,20 +16,20 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UpdateMemberRequest {
 
-    @Size(max = 100)
+    @Size(max = 100, message = "Üzvün adı maksimum 100 simvoldan ibarət ola bilər")
     private String firstName;
 
-    @Size(max = 100)
+    @Size(max = 100, message = "Üzvün soyadı maksimum 100 simvoldan ibarət ola bilər")
     private String lastName;
 
-    @Email
-    @Size(max = 150)
+    @Email(message = "Düzgün e-poçt ünvanı daxil edin")
+    @Size(max = 150, message = "E-poçt ünvanı maksimum 150 simvoldan ibarət ola bilər")
     private String email;
 
-    @Size(max = 20)
+    @Size(max = 20, message = "Telefon nömrəsi maksimum 20 simvoldan ibarət ola bilər")
     private String phone;
 
-    @Size(max = 500)
+    @Size(max = 500, message = "Ünvan maksimum 500 simvoldan ibarət ola bilər")
     private String address;
 
     private LocalDate dateOfBirth;

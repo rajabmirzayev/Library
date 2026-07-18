@@ -15,13 +15,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CreateReservationRequest {
 
-    @NotNull
+    @NotNull(message = "Kitab seçilməsi məcburidir")
     private Long bookId;
 
-    @NotNull
+    @NotNull(message = "Üzv seçilməsi məcburidir")
     private Long memberId;
 
-    @NotNull
+    @NotNull(message = "Bitmə tarixi boş ola bilməz")
     private LocalDate expiryDate;
 
 }

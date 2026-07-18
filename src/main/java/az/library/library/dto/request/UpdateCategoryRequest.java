@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UpdateCategoryRequest {
 
-    @Size(max = 100)
+    @Size(max = 100, message = "Kateqoriya adı maksimum 100 simvoldan ibarət ola bilər")
     private String name;
 
-    @Size(max = 500)
+    @Size(max = 500, message = "Təsvir maksimum 500 simvoldan ibarət ola bilər")
     private String description;
 
     private Long parentId;
