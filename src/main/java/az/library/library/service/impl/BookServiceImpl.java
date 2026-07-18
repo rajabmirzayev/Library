@@ -7,19 +7,19 @@ import az.library.library.dto.response.BookSummaryResponse;
 import az.library.library.entity.Author;
 import az.library.library.entity.Book;
 import az.library.library.entity.Category;
-import az.library.library.entity.Publisher;
-import az.library.library.enums.BookStatus;
 import az.library.library.exception.ResourceNotFoundException;
 import az.library.library.mapper.BookMapper;
 import az.library.library.repository.*;
 import az.library.library.service.BookService;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -41,12 +41,12 @@ public class BookServiceImpl implements BookService {
         if (request.getPublisherId() != null)
             book.setPublisher(publisherRepository.findById(request.getPublisherId())
                     .orElseThrow(() -> new ResourceNotFoundException("Publisher", request.getPublisherId())));
-        java.util.Set<Author> authors = new java.util.HashSet<>(authorRepository.findAllById(request.getAuthorIds()));
+        Set<Author> authors = new HashSet<>(authorRepository.findAllById(request.getAuthorIds()));
         if (authors.size() != request.getAuthorIds().size())
             throw new IllegalArgumentException("Some authors not found");
         book.setAuthors(authors);
         if (request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
-            java.util.Set<Category> cats = new java.util.HashSet<>(categoryRepository.findAllById(request.getCategoryIds()));
+            Set<Category> cats = new HashSet<>(categoryRepository.findAllById(request.getCategoryIds()));
             book.setCategories(cats);
         }
         return bookMapper.toDetailedResponse(bookRepository.save(book));
@@ -59,9 +59,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookSummaryResponse> findAll() {
-        return bookRepository.findAll().stream()
-                .map(bookMapper::toSummaryResponse).collect(Collectors.toList());
+    public Page<BookSummaryResponse> findAll(Pageable pageable) {
+        return bookRepository.findAll(pageable).map(bookMapper::toSummaryResponse);
     }
 
     @Override
@@ -86,12 +85,12 @@ public class BookServiceImpl implements BookService {
                     .orElseThrow(() -> new ResourceNotFoundException("Publisher", request.getPublisherId())));
         }
         if (request.getAuthorIds() != null) {
-            java.util.Set<Author> authors = new java.util.HashSet<>(authorRepository.findAllById(request.getAuthorIds()));
+            Set<Author> authors = new HashSet<>(authorRepository.findAllById(request.getAuthorIds()));
             book.setAuthors(authors);
         }
         if (request.getCategoryIds() != null) {
-            if (request.getCategoryIds().isEmpty()) book.setCategories(new java.util.HashSet<>());
-            else book.setCategories(new java.util.HashSet<>(categoryRepository.findAllById(request.getCategoryIds())));
+            if (request.getCategoryIds().isEmpty()) book.setCategories(new HashSet<>());
+            else book.setCategories(new HashSet<>(categoryRepository.findAllById(request.getCategoryIds())));
         }
         return bookMapper.toDetailedResponse(bookRepository.save(book));
     }

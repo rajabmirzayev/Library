@@ -5,12 +5,12 @@ import az.library.library.dto.request.CreateLoanRequest;
 import az.library.library.dto.request.UpdateLoanRequest;
 import az.library.library.dto.response.LoanDetailedResponse;
 import az.library.library.dto.response.LoanSummaryResponse;
+import az.library.library.dto.response.PageResponse;
 import az.library.library.service.LoanService;
 import jakarta.validation.Valid;
-
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +32,9 @@ public class LoanController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<LoanSummaryResponse>>> findAll() {
-        return ResponseEntity.ok(ApiResponse.success(service.findAll()));
+    public ResponseEntity<ApiResponse<PageResponse<LoanSummaryResponse>>> findAll(
+            @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.of(service.findAll(pageable))));
     }
 
     @PutMapping("/{id}")

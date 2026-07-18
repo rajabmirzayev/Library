@@ -4,8 +4,8 @@ import az.library.library.dto.request.CreatePublisherRequest;
 import az.library.library.dto.request.UpdatePublisherRequest;
 import az.library.library.dto.response.PublisherDetailedResponse;
 import az.library.library.dto.response.PublisherSummaryResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface PublisherService {
 
@@ -13,7 +13,7 @@ public interface PublisherService {
 
     PublisherDetailedResponse findById(Long id);
 
-    List<PublisherSummaryResponse> findAll();
+    Page<PublisherSummaryResponse> findAll(Pageable pageable);
 
     PublisherDetailedResponse update(Long id, UpdatePublisherRequest request);
 

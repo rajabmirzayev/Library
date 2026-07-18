@@ -5,10 +5,7 @@ import az.library.library.dto.request.UpdateFineRequest;
 import az.library.library.dto.response.FineDetailedResponse;
 import az.library.library.dto.response.FineSummaryResponse;
 import az.library.library.entity.Fine;
-import az.library.library.entity.Loan;
-import az.library.library.entity.Member;
 import az.library.library.enums.FineStatus;
-import az.library.library.enums.FineType;
 import az.library.library.exception.ResourceNotFoundException;
 import az.library.library.mapper.FineMapper;
 import az.library.library.repository.FineRepository;
@@ -17,10 +14,10 @@ import az.library.library.repository.MemberRepository;
 import az.library.library.service.FineService;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,10 +33,9 @@ public class FineServiceImpl implements FineService {
     @Override
     @Transactional
     public FineDetailedResponse create(CreateFineRequest request) {
-        Member member = memberRepo.findById(request.getMemberId())
+        memberRepo.findById(request.getMemberId())
                 .orElseThrow(() -> new ResourceNotFoundException("Member", request.getMemberId()));
         Fine entity = mapper.toEntityForCreate(request);
-        entity.setMember(member);
         entity.setIssuedDate(LocalDateTime.now());
         entity.setStatus(FineStatus.PENDING);
         if (request.getLoanId() != null)
@@ -55,8 +51,8 @@ public class FineServiceImpl implements FineService {
     }
 
     @Override
-    public List<FineSummaryResponse> findAll() {
-        return repo.findAll().stream().map(mapper::toSummaryResponse).collect(Collectors.toList());
+    public Page<FineSummaryResponse> findAll(Pageable pageable) {
+        return repo.findAll(pageable).map(mapper::toSummaryResponse);
     }
 
     @Override

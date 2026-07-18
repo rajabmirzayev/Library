@@ -9,10 +9,9 @@ import az.library.library.mapper.AuthorMapper;
 import az.library.library.repository.AuthorRepository;
 import az.library.library.service.AuthorService;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,8 +36,8 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public List<AuthorSummaryResponse> findAll() {
-        return repo.findAll().stream().map(mapper::toSummaryResponse).collect(Collectors.toList());
+    public Page<AuthorSummaryResponse> findAll(Pageable pageable) {
+        return repo.findAll(pageable).map(mapper::toSummaryResponse);
     }
 
     @Override

@@ -16,10 +16,10 @@ import az.library.library.repository.ReservationRepository;
 import az.library.library.service.ReservationService;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,8 +55,8 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public List<ReservationSummaryResponse> findAll() {
-        return repo.findAll().stream().map(mapper::toSummaryResponse).collect(Collectors.toList());
+    public Page<ReservationSummaryResponse> findAll(Pageable pageable) {
+        return repo.findAll(pageable).map(mapper::toSummaryResponse);
     }
 
     @Override

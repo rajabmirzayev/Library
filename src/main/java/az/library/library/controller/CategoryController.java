@@ -5,12 +5,12 @@ import az.library.library.dto.request.CreateCategoryRequest;
 import az.library.library.dto.request.UpdateCategoryRequest;
 import az.library.library.dto.response.CategoryDetailedResponse;
 import az.library.library.dto.response.CategorySummaryResponse;
+import az.library.library.dto.response.PageResponse;
 import az.library.library.service.CategoryService;
 import jakarta.validation.Valid;
-
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +32,9 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CategorySummaryResponse>>> findAll() {
-        return ResponseEntity.ok(ApiResponse.success(service.findAll()));
+    public ResponseEntity<ApiResponse<PageResponse<CategorySummaryResponse>>> findAll(
+            @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.of(service.findAll(pageable))));
     }
 
     @PutMapping("/{id}")

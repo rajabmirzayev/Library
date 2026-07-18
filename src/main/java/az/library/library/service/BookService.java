@@ -4,8 +4,8 @@ import az.library.library.dto.request.CreateBookRequest;
 import az.library.library.dto.request.UpdateBookRequest;
 import az.library.library.dto.response.BookDetailedResponse;
 import az.library.library.dto.response.BookSummaryResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface BookService {
 
@@ -13,7 +13,7 @@ public interface BookService {
 
     BookDetailedResponse findById(Long id);
 
-    List<BookSummaryResponse> findAll();
+    Page<BookSummaryResponse> findAll(Pageable pageable);
 
     BookDetailedResponse update(Long id, UpdateBookRequest request);
 

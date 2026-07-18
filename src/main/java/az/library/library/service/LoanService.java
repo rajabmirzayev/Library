@@ -4,8 +4,8 @@ import az.library.library.dto.request.CreateLoanRequest;
 import az.library.library.dto.request.UpdateLoanRequest;
 import az.library.library.dto.response.LoanDetailedResponse;
 import az.library.library.dto.response.LoanSummaryResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface LoanService {
 
@@ -13,7 +13,7 @@ public interface LoanService {
 
     LoanDetailedResponse findById(Long id);
 
-    List<LoanSummaryResponse> findAll();
+    Page<LoanSummaryResponse> findAll(Pageable pageable);
 
     LoanDetailedResponse update(Long id, UpdateLoanRequest request);
 

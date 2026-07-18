@@ -3,14 +3,14 @@ package az.library.library.controller;
 import az.library.library.dto.ApiResponse;
 import az.library.library.dto.request.CreatePublisherRequest;
 import az.library.library.dto.request.UpdatePublisherRequest;
+import az.library.library.dto.response.PageResponse;
 import az.library.library.dto.response.PublisherDetailedResponse;
 import az.library.library.dto.response.PublisherSummaryResponse;
 import az.library.library.service.PublisherService;
 import jakarta.validation.Valid;
-
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +32,9 @@ public class PublisherController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PublisherSummaryResponse>>> findAll() {
-        return ResponseEntity.ok(ApiResponse.success(service.findAll()));
+    public ResponseEntity<ApiResponse<PageResponse<PublisherSummaryResponse>>> findAll(
+            @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.of(service.findAll(pageable))));
     }
 
     @PutMapping("/{id}")

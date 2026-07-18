@@ -4,16 +4,14 @@ import az.library.library.dto.request.CreateCategoryRequest;
 import az.library.library.dto.request.UpdateCategoryRequest;
 import az.library.library.dto.response.CategoryDetailedResponse;
 import az.library.library.dto.response.CategorySummaryResponse;
-import az.library.library.entity.Category;
 import az.library.library.exception.ResourceNotFoundException;
 import az.library.library.mapper.CategoryMapper;
 import az.library.library.repository.CategoryRepository;
 import az.library.library.service.CategoryService;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,8 +39,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategorySummaryResponse> findAll() {
-        return repo.findAll().stream().map(mapper::toSummaryResponse).collect(Collectors.toList());
+    public Page<CategorySummaryResponse> findAll(Pageable pageable) {
+        return repo.findAll(pageable).map(mapper::toSummaryResponse);
     }
 
     @Override

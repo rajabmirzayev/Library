@@ -4,8 +4,8 @@ import az.library.library.dto.request.CreateReservationRequest;
 import az.library.library.dto.request.UpdateReservationRequest;
 import az.library.library.dto.response.ReservationDetailedResponse;
 import az.library.library.dto.response.ReservationSummaryResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ReservationService {
 
@@ -13,7 +13,7 @@ public interface ReservationService {
 
     ReservationDetailedResponse findById(Long id);
 
-    List<ReservationSummaryResponse> findAll();
+    Page<ReservationSummaryResponse> findAll(Pageable pageable);
 
     ReservationDetailedResponse update(Long id, UpdateReservationRequest request);
 

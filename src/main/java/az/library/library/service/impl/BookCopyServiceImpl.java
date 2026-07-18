@@ -4,8 +4,8 @@ import az.library.library.dto.request.CreateBookCopyRequest;
 import az.library.library.dto.request.UpdateBookCopyRequest;
 import az.library.library.dto.response.BookCopyDetailedResponse;
 import az.library.library.dto.response.BookCopySummaryResponse;
-import az.library.library.entity.Book;
 import az.library.library.entity.BookCopy;
+import az.library.library.enums.BookCopyCondition;
 import az.library.library.enums.BookCopyStatus;
 import az.library.library.exception.ResourceNotFoundException;
 import az.library.library.mapper.BookCopyMapper;
@@ -13,10 +13,9 @@ import az.library.library.repository.BookCopyRepository;
 import az.library.library.repository.BookRepository;
 import az.library.library.service.BookCopyService;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,8 +47,8 @@ public class BookCopyServiceImpl implements BookCopyService {
     }
 
     @Override
-    public List<BookCopySummaryResponse> findAll() {
-        return repo.findAll().stream().map(mapper::toSummaryResponse).collect(Collectors.toList());
+    public Page<BookCopySummaryResponse> findAll(Pageable pageable) {
+        return repo.findAll(pageable).map(mapper::toSummaryResponse);
     }
 
     @Override
@@ -63,7 +62,7 @@ public class BookCopyServiceImpl implements BookCopyService {
         }
         if (request.getShelfLocation() != null) entity.setShelfLocation(request.getShelfLocation());
         if (request.getCondition() != null)
-            entity.setCondition(az.library.library.enums.BookCopyCondition.valueOf(request.getCondition()));
+            entity.setCondition(BookCopyCondition.valueOf(request.getCondition()));
         if (request.getBookId() != null)
             entity.setBook(bookRepo.findById(request.getBookId())
                     .orElseThrow(() -> new ResourceNotFoundException("Book", request.getBookId())));

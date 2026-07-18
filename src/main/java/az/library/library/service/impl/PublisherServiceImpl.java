@@ -9,10 +9,9 @@ import az.library.library.mapper.PublisherMapper;
 import az.library.library.repository.PublisherRepository;
 import az.library.library.service.PublisherService;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,8 +35,8 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
-    public List<PublisherSummaryResponse> findAll() {
-        return repo.findAll().stream().map(mapper::toSummaryResponse).collect(Collectors.toList());
+    public Page<PublisherSummaryResponse> findAll(Pageable pageable) {
+        return repo.findAll(pageable).map(mapper::toSummaryResponse);
     }
 
     @Override

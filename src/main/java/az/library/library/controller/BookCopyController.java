@@ -5,12 +5,12 @@ import az.library.library.dto.request.CreateBookCopyRequest;
 import az.library.library.dto.request.UpdateBookCopyRequest;
 import az.library.library.dto.response.BookCopyDetailedResponse;
 import az.library.library.dto.response.BookCopySummaryResponse;
+import az.library.library.dto.response.PageResponse;
 import az.library.library.service.BookCopyService;
 import jakarta.validation.Valid;
-
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +32,9 @@ public class BookCopyController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<BookCopySummaryResponse>>> findAll() {
-        return ResponseEntity.ok(ApiResponse.success(service.findAll()));
+    public ResponseEntity<ApiResponse<PageResponse<BookCopySummaryResponse>>> findAll(
+            @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.of(service.findAll(pageable))));
     }
 
     @PutMapping("/{id}")

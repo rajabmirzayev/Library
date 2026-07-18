@@ -4,8 +4,8 @@ import az.library.library.dto.request.CreateAuthorRequest;
 import az.library.library.dto.request.UpdateAuthorRequest;
 import az.library.library.dto.response.AuthorDetailedResponse;
 import az.library.library.dto.response.AuthorSummaryResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface AuthorService {
 
@@ -13,7 +13,7 @@ public interface AuthorService {
 
     AuthorDetailedResponse findById(Long id);
 
-    List<AuthorSummaryResponse> findAll();
+    Page<AuthorSummaryResponse> findAll(Pageable pageable);
 
     AuthorDetailedResponse update(Long id, UpdateAuthorRequest request);
 
