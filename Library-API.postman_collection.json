@@ -1,0 +1,1836 @@
+{
+  "info": {
+    "_postman_id": "017b2bdd-105b-4d47-959f-afa0f15dbc98",
+    "name": "Library Management System API",
+    "description": "Kitabxana İdarəetmə Sistemi API Kolleksiyası\n\nBu kolleksiya bütün CRUD endpoint-ləri əhatə edir.\n\nİstifadə:\n1. 'Library-Local' environment-ı import edin\n2. base_url dəyərini tənzimləyin\n3. Create endpoint-ləri işlədikdən sonra avtomatik olaraq ID-lər environment-ə yazılır\n4. Sonrakı endpoint-lərdə bu ID-lərdən istifadə edə bilərsiniz",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51568589",
+    "_collection_link": "https://go.postman.co/collection/51568589-017b2bdd-105b-4d47-959f-afa0f15dbc98?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Müəlliflər (Authors)",
+      "item": [
+        {
+          "name": "Create Author",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var data = pm.response.json();",
+                  "    if (data.success && data.data && data.data.id) {",
+                  "        pm.environment.set('author_id', data.data.id);",
+                  "        console.log('author_id captured: ' + data.data.id);",
+                  "    }",
+                  "}",
+                  "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Çingiz\",\n  \"lastName\": \"Abdullayev\",\n  \"biography\": \"Məşhur Azərbaycan yazıçısı\",\n  \"birthDate\": \"1977-02-12\",\n  \"nationality\": \"Azərbaycan\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/authors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "authors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Authors (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response has pagination', () => {",
+                  "    var data = pm.response.json();",
+                  "    pm.expect(data.data).to.have.property('content');",
+                  "    pm.expect(data.data).to.have.property('totalElements');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/authors?page=0&size=20&sort=id,desc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "authors"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "id,desc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Author by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/authors/{{author_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "authors",
+                "{{author_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Author",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Çingiz\",\n  \"lastName\": \"Abdullayev\",\n  \"biography\": \"Azərbaycanın görkəmli yazıçısı\",\n  \"nationality\": \"Azərbaycan\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/authors/{{author_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "authors",
+                "{{author_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Author",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/authors/{{author_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "authors",
+                "{{author_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Nəşriyyatlar (Publishers)",
+      "item": [
+        {
+          "name": "Create Publisher",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var data = pm.response.json();",
+                  "    if (data.success && data.data && data.data.id) {",
+                  "        pm.environment.set('publisher_id', data.data.id);",
+                  "        console.log('publisher_id captured: ' + data.data.id);",
+                  "    }",
+                  "}",
+                  "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Qanun Nəşriyyatı\",\n  \"address\": \"Bakı şəhəri, Nizami küç. 12\",\n  \"phone\": \"+994501234567\",\n  \"email\": \"info@qanun.az\",\n  \"website\": \"https://qanun.az\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/publishers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "publishers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Publishers (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response has pagination', () => {",
+                  "    var data = pm.response.json();",
+                  "    pm.expect(data.data).to.have.property('content');",
+                  "    pm.expect(data.data).to.have.property('totalElements');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/publishers?page=0&size=20&sort=id,desc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "publishers"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "id,desc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Publisher by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/publishers/{{publisher_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "publishers",
+                "{{publisher_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Publisher",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Qanun Nəşriyyatı\",\n  \"address\": \"Bakı şəhəri, Nizami küç. 15\",\n  \"phone\": \"+994509876543\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/publishers/{{publisher_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "publishers",
+                "{{publisher_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Publisher",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/publishers/{{publisher_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "publishers",
+                "{{publisher_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Kategoriyalar (Categories)",
+      "item": [
+        {
+          "name": "Create Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var data = pm.response.json();",
+                  "    if (data.success && data.data && data.data.id) {",
+                  "        pm.environment.set('category_id', data.data.id);",
+                  "        console.log('category_id captured: ' + data.data.id);",
+                  "    }",
+                  "}",
+                  "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bədii ədəbiyyat\",\n  \"description\": \"Bədii ədəbiyyat əsərləri\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Categories (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response has pagination', () => {",
+                  "    var data = pm.response.json();",
+                  "    pm.expect(data.data).to.have.property('content');",
+                  "    pm.expect(data.data).to.have.property('totalElements');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/categories?page=0&size=20&sort=id,desc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "categories"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "id,desc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Category by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/categories/{{category_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "categories",
+                "{{category_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Elmi ədəbiyyat janrı\",\n    \"description\": \"Elmi janrda yazılmış əsərlər\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/categories/{{category_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "categories",
+                "{{category_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/categories/{{category_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "categories",
+                "{{category_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Kitablar (Books)",
+      "item": [
+        {
+          "name": "Create Book",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var data = pm.response.json();",
+                  "    if (data.success && data.data && data.data.id) {",
+                  "        pm.environment.set('book_id', data.data.id);",
+                  "        console.log('book_id captured: ' + data.data.id);",
+                  "    }",
+                  "}",
+                  "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Üçippyşq\",\n  \"isbn\": \"978-0-13-468599-1\",\n  \"publicationYear\": 2024,\n  \"edition\": \"1-ci nəşr\",\n  \"pageCount\": 350,\n  \"language\": \"Azərbaycan\",\n  \"summary\": \"Maraqlı roman\",\n  \"publisherId\": null,\n  \"authorIds\": [1],\n  \"categoryIds\": [1]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/books",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "books"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Books (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response has pagination', () => {",
+                  "    var data = pm.response.json();",
+                  "    pm.expect(data.data).to.have.property('content');",
+                  "    pm.expect(data.data).to.have.property('totalElements');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/books?page=0&size=20&sort=id,desc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "books"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "id,desc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Book by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/books/{{book_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "books",
+                "{{book_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Book",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Üçippyşq - Yeni Nəşr\",\n  \"pageCount\": 400,\n  \"language\": \"Azərbaycan\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/books/{{book_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "books",
+                "{{book_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Book",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/books/{{book_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "books",
+                "{{book_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Kitab Nüsxələri (Book Copies)",
+      "item": [
+        {
+          "name": "Create Book Copy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var data = pm.response.json();",
+                  "    if (data.success && data.data && data.data.id) {",
+                  "        pm.environment.set('book_copy_id', data.data.id);",
+                  "        console.log('book_copy_id captured: ' + data.data.id);",
+                  "    }",
+                  "}",
+                  "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barcode\": \"BK-2026-002\",\n  \"shelfLocation\": \"A-3-12\",\n  \"condition\": \"NEW\",\n  \"bookId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/book-copies",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "book-copies"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Book Copies (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response has pagination', () => {",
+                  "    var data = pm.response.json();",
+                  "    pm.expect(data.data).to.have.property('content');",
+                  "    pm.expect(data.data).to.have.property('totalElements');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/book-copies?page=0&size=20&sort=id,desc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "book-copies"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "id,desc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Book Copy by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/book-copies/{{book_copy_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "book-copies",
+                "{{book_copy_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Book Copy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shelfLocation\": \"B-1-06\",\n  \"condition\": \"GOOD\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/book-copies/{{book_copy_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "book-copies",
+                "{{book_copy_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Book Copy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/book-copies/{{book_copy_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "book-copies",
+                "{{book_copy_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Üzvlər (Members)",
+      "item": [
+        {
+          "name": "Create Member",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var data = pm.response.json();",
+                  "    if (data.success && data.data && data.data.id) {",
+                  "        pm.environment.set('member_id', data.data.id);",
+                  "        console.log('member_id captured: ' + data.data.id);",
+                  "    }",
+                  "}",
+                  "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Əli\",\n  \"lastName\": \"Həsənov\",\n  \"email\": \"ali@library.az\",\n  \"phone\": \"+994501234567\",\n  \"address\": \"Bakı şəhəri\",\n  \"dateOfBirth\": \"1995-06-15\",\n  \"gender\": \"MALE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/members",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "members"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Members (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response has pagination', () => {",
+                  "    var data = pm.response.json();",
+                  "    pm.expect(data.data).to.have.property('content');",
+                  "    pm.expect(data.data).to.have.property('totalElements');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/members?page=0&size=20&sort=id,desc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "members"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "id,desc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Member by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/members/{{member_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "members",
+                "{{member_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Member",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+994509876543\",\n  \"address\": \"Bakı şəhəri, Nəsimi r-nu\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/members/{{member_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "members",
+                "{{member_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Member",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/members/{{member_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "members",
+                "{{member_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Borclanmalar (Loans)",
+      "item": [
+        {
+          "name": "Create Loan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var data = pm.response.json();",
+                  "    if (data.success && data.data && data.data.id) {",
+                  "        pm.environment.set('loan_id', data.data.id);",
+                  "        console.log('loan_id captured: ' + data.data.id);",
+                  "    }",
+                  "}",
+                  "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookCopyId\": 1,\n  \"memberId\": 1,\n  \"dueDate\": \"2026-08-15\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/loans",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "loans"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Loans (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response has pagination', () => {",
+                  "    var data = pm.response.json();",
+                  "    pm.expect(data.data).to.have.property('content');",
+                  "    pm.expect(data.data).to.have.property('totalElements');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/loans?page=0&size=20&sort=id,desc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "loans"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "id,desc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Loan by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/loans/{{loan_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "loans",
+                "{{loan_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Loan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dueDate\": \"2026-09-01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/loans/{{loan_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "loans",
+                "{{loan_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Loan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/loans/{{loan_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "loans",
+                "{{loan_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cərimələr (Fines)",
+      "item": [
+        {
+          "name": "Create Fine",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var data = pm.response.json();",
+                  "    if (data.success && data.data && data.data.id) {",
+                  "        pm.environment.set('fine_id', data.data.id);",
+                  "        console.log('fine_id captured: ' + data.data.id);",
+                  "    }",
+                  "}",
+                  "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 25.50,\n  \"reason\": \"Gecikmiş qayıtma\",\n  \"type\": \"LATE_RETURN\",\n  \"loanId\": 1,\n  \"memberId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/fines",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "fines"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Fines (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response has pagination', () => {",
+                  "    var data = pm.response.json();",
+                  "    pm.expect(data.data).to.have.property('content');",
+                  "    pm.expect(data.data).to.have.property('totalElements');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/fines?page=0&size=20&sort=id,desc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "fines"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "id,desc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Fine by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/fines/{{fine_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "fines",
+                "{{fine_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Fine",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 30.00,\n  \"reason\": \"Zədələnmiş kitab\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/fines/{{fine_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "fines",
+                "{{fine_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Fine",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/fines/{{fine_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "fines",
+                "{{fine_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Rezervasiyalar (Reservations)",
+      "item": [
+        {
+          "name": "Create Reservation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var data = pm.response.json();",
+                  "    if (data.success && data.data && data.data.id) {",
+                  "        pm.environment.set('reservation_id', data.data.id);",
+                  "        console.log('reservation_id captured: ' + data.data.id);",
+                  "    }",
+                  "}",
+                  "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookId\": 1,\n  \"memberId\": 1,\n  \"expiryDate\": \"2026-08-01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "reservations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Reservations (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response has pagination', () => {",
+                  "    var data = pm.response.json();",
+                  "    pm.expect(data.data).to.have.property('content');",
+                  "    pm.expect(data.data).to.have.property('totalElements');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/reservations?page=0&size=20&sort=id,desc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "reservations"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "id,desc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reservation by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/reservations/{{reservation_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "reservations",
+                "{{reservation_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Reservation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expiryDate\": \"2026-09-01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/reservations/{{reservation_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "reservations",
+                "{{reservation_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Reservation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/reservations/{{reservation_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "reservations",
+                "{{reservation_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3133 @@
+{
+  "info": {
+    "_postman_id": "0f227e91-0de4-4926-a2f5-76c78fbaedfb",
+    "name": "Library Management System - KPI Tests",
+    "description": "Kitabxana İdarəetmə Sistemi - KPI Test Kolleksiyası\n\nBu kolleksiya bütün CRUD endpoint-ləri, validasiya xətalarını, 404 cavablarını, səhifələmə (pagination) testlərini və cavab müddəti (response time) yoxlamalarını əhatə edir.\n\nİstifadə:\n1. 'Library-Local' environment-ı import edin\n2. Bu kolleksiyadan 'Library API' kolleksiyasından əvvəl Health Check qovluğunu çalışdırın\n3. Sonra 'Set Up Data' qovluğunu çalışdırın\n4. KPI testlərini fərdi olaraq və ya tam olaraq çalışdırın",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51568589",
+    "_collection_link": "https://go.postman.co/collection/51568589-0f227e91-0de4-4926-a2f5-76c78fbaedfb?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response time < 3000ms', () => pm.expect(pm.response.responseTime).to.be.below(3000));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/actuator/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Swagger UI Accessible",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/swagger-ui/index.html",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "swagger-ui",
+                "index.html"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Set Up Data (CRUD + KPI)",
+      "item": [
+        {
+          "name": "Müəlliflər (Authors)",
+          "item": [
+            {
+              "name": "Create Müəlliflər (Authors) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    var data = pm.response.json();",
+                      "    if (data.success && data.data && data.data.id) {",
+                      "        pm.environment.set('Author_id', data.data.id);",
+                      "        console.log('Author_id captured: ' + data.data.id);",
+                      "    }",
+                      "}",
+                      "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"firstName\": \"Çingiz\",\n    \"lastName\": \"Abdullayev\",\n    \"biography\": \"Məşhur Azərbaycan yazıçısı\",\n    \"birthDate\": \"1977-02-12\",\n    \"nationality\": \"Azərbaycan\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/authors",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "authors"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Müəlliflər (Authors) - Validation Error",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Returns Problem Details', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data).to.have.property('status');",
+                      "    pm.expect(data.status).to.equal(400);",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"firstName\": \"\",\n    \"lastName\": \"\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/authors",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "authors"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Authors (Paginated) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Pagination structure valid', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.data).to.have.property('content');",
+                      "    pm.expect(data.data).to.have.property('totalElements');",
+                      "    pm.expect(data.data).to.have.property('totalPages');",
+                      "    pm.expect(data.data).to.have.property('size');",
+                      "    pm.expect(data.data).to.have.property('number');",
+                      "    pm.expect(Array.isArray(data.data.content)).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/authors?page=0&size=20&sort=id,desc",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "authors"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "id,desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Müəlliflər (Authors) by ID - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Response has data', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.success).to.be.true;",
+                      "    pm.expect(data.data).to.have.property('id');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/authors/{{author_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "authors",
+                    "{{author_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Müəlliflər (Authors) by ID - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/authors/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "authors",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Müəlliflər (Authors) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"firstName\": \"\\u00c7ingiz\",\n    \"lastName\": \"Abdullayev\",\n    \"biography\": \"Az\\u0259rbaycan\\u0131n g\\u00f6rk\\u0259mli yaz\\u0131\\u00e7\\u0131s\\u0131\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/authors/{{author_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "authors",
+                    "{{author_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Müəlliflər (Authors) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"firstName\": \"\\u00c7ingiz\", \"lastName\": \"Abdullayev\", \"biography\": \"Az\\u0259rbaycan\\u0131n g\\u00f6rk\\u0259mli yaz\\u0131\\u00e7\\u0131s\\u0131\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/authors/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "authors",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Müəlliflər (Authors) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/authors/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "authors",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Nəşriyyatlar (Publishers)",
+          "item": [
+            {
+              "name": "Create Nəşriyyatlar (Publishers) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    var data = pm.response.json();",
+                      "    if (data.success && data.data && data.data.id) {",
+                      "        pm.environment.set('Publisher_id', data.data.id);",
+                      "        console.log('Publisher_id captured: ' + data.data.id);",
+                      "    }",
+                      "}",
+                      "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Qanun N\\u0259\\u015friyyat\\u0131\", \"address\": \"Bak\\u0131 \\u015f\\u0259h\\u0259ri, Nizami k\\u00fc\\u00e7. 12\", \"phone\": \"+994501234567\", \"email\": \"info@qanun.az\", \"website\": \"https://qanun.az\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/publishers",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "publishers"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Nəşriyyatlar (Publishers) - Validation Error",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Returns Problem Details', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data).to.have.property('status');",
+                      "    pm.expect(data.status).to.equal(400);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/publishers",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "publishers"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Publishers (Paginated) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Pagination structure valid', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.data).to.have.property('content');",
+                      "    pm.expect(data.data).to.have.property('totalElements');",
+                      "    pm.expect(data.data).to.have.property('totalPages');",
+                      "    pm.expect(data.data).to.have.property('size');",
+                      "    pm.expect(data.data).to.have.property('number');",
+                      "    pm.expect(Array.isArray(data.data.content)).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/publishers?page=0&size=20&sort=id,desc",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "publishers"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "id,desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Nəşriyyatlar (Publishers) by ID - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Response has data', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.success).to.be.true;",
+                      "    pm.expect(data.data).to.have.property('id');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/publishers/{{publisher_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "publishers",
+                    "{{publisher_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Nəşriyyatlar (Publishers) by ID - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/publishers/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "publishers",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Nəşriyyatlar (Publishers) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Qanun N\\u0259\\u015friyyat\\u0131\", \"address\": \"Bak\\u0131 \\u015f\\u0259h\\u0259ri, Nizami k\\u00fc\\u00e7. 15\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/publishers/{{publisher_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "publishers",
+                    "{{publisher_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Nəşriyyatlar (Publishers) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Qanun N\\u0259\\u015friyyat\\u0131\", \"address\": \"Bak\\u0131 \\u015f\\u0259h\\u0259ri, Nizami k\\u00fc\\u00e7. 15\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/publishers/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "publishers",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Nəşriyyatlar (Publishers) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/publishers/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "publishers",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Kategoriyalar (Categories)",
+          "item": [
+            {
+              "name": "Create Kategoriyalar (Categories) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    var data = pm.response.json();",
+                      "    if (data.success && data.data && data.data.id) {",
+                      "        pm.environment.set('Category_id', data.data.id);",
+                      "        console.log('Category_id captured: ' + data.data.id);",
+                      "    }",
+                      "}",
+                      "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"B\\u0259dii \\u0259d\\u0259biyyat\", \"description\": \"B\\u0259dii \\u0259d\\u0259biyyat \\u0259s\\u0259rl\\u0259ri\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/categories",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Kategoriyalar (Categories) - Validation Error",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Returns Problem Details', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data).to.have.property('status');",
+                      "    pm.expect(data.status).to.equal(400);",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/categories",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Categorys (Paginated) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Pagination structure valid', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.data).to.have.property('content');",
+                      "    pm.expect(data.data).to.have.property('totalElements');",
+                      "    pm.expect(data.data).to.have.property('totalPages');",
+                      "    pm.expect(data.data).to.have.property('size');",
+                      "    pm.expect(data.data).to.have.property('number');",
+                      "    pm.expect(Array.isArray(data.data.content)).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/categories?page=0&size=20&sort=id,desc",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "categories"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "id,desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Kategoriyalar (Categories) by ID - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Response has data', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.success).to.be.true;",
+                      "    pm.expect(data.data).to.have.property('id');",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/categories/{{category_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "categories",
+                    "{{category_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Kategoriyalar (Categories) by ID - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/categories/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "categories",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Kategoriyalar (Categories) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Elmi \\u0259d\\u0259biyyat\", \"description\": \"Elmi janrda yaz\\u0131lm\\u0131\\u015f \\u0259s\\u0259rl\\u0259r\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/categories/{{category_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "categories",
+                    "{{category_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Kategoriyalar (Categories) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Elmi \\u0259d\\u0259biyyat\", \"description\": \"Elmi janrda yaz\\u0131lm\\u0131\\u015f \\u0259s\\u0259rl\\u0259r\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/categories/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "categories",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Kategoriyalar (Categories) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/categories/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "categories",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Üzvlər (Members)",
+          "item": [
+            {
+              "name": "Create Üzvlər (Members) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    var data = pm.response.json();",
+                      "    if (data.success && data.data && data.data.id) {",
+                      "        pm.environment.set('Member_id', data.data.id);",
+                      "        console.log('Member_id captured: ' + data.data.id);",
+                      "    }",
+                      "}",
+                      "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"firstName\": \"\\u018fli\", \"lastName\": \"H\\u0259s\\u0259nov\", \"email\": \"ali@library.az\", \"phone\": \"+994501234567\", \"address\": \"Bak\\u0131 \\u015f\\u0259h\\u0259ri\", \"dateOfBirth\": \"1995-06-15\", \"gender\": \"MALE\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/members",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "members"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Üzvlər (Members) - Validation Error",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Returns Problem Details', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data).to.have.property('status');",
+                      "    pm.expect(data.status).to.equal(400);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"firstName\": \"\", \"lastName\": \"\", \"email\": \"invalid\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/members",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "members"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Members (Paginated) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Pagination structure valid', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.data).to.have.property('content');",
+                      "    pm.expect(data.data).to.have.property('totalElements');",
+                      "    pm.expect(data.data).to.have.property('totalPages');",
+                      "    pm.expect(data.data).to.have.property('size');",
+                      "    pm.expect(data.data).to.have.property('number');",
+                      "    pm.expect(Array.isArray(data.data.content)).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/members?page=0&size=20&sort=id,desc",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "members"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "id,desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Üzvlər (Members) by ID - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Response has data', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.success).to.be.true;",
+                      "    pm.expect(data.data).to.have.property('id');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/members/{{member_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "members",
+                    "{{member_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Üzvlər (Members) by ID - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/members/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "members",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Üzvlər (Members) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"phone\": \"+994509876543\", \"address\": \"Bak\\u0131 \\u015f\\u0259h\\u0259ri, N\\u0259simi r-nu\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/members/{{member_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "members",
+                    "{{member_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Üzvlər (Members) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"phone\": \"+994509876543\", \"address\": \"Bak\\u0131 \\u015f\\u0259h\\u0259ri, N\\u0259simi r-nu\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/members/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "members",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Üzvlər (Members) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/members/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "members",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Kitablar (Books)",
+          "item": [
+            {
+              "name": "Create Kitablar (Books) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    var data = pm.response.json();",
+                      "    if (data.success && data.data && data.data.id) {",
+                      "        pm.environment.set('Book_id', data.data.id);",
+                      "        console.log('Book_id captured: ' + data.data.id);",
+                      "    }",
+                      "}",
+                      "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"title\": \"\\u00dc\\u00e7ippy\\u015fq\", \"isbn\": \"978-0-13-468599-1\", \"publicationYear\": 2024, \"edition\": \"1-ci n\\u0259\\u015fr\", \"pageCount\": 350, \"language\": \"Az\\u0259rbaycan\", \"summary\": \"Maraql\\u0131 roman\", \"publisherId\": null, \"authorIds\": [1], \"categoryIds\": [1]}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/books",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "books"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Kitablar (Books) - Validation Error",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Returns Problem Details', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data).to.have.property('status');",
+                      "    pm.expect(data.status).to.equal(400);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"title\": \"\", \"isbn\": \"\", \"authorIds\": null}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/books",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "books"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Books (Paginated) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Pagination structure valid', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.data).to.have.property('content');",
+                      "    pm.expect(data.data).to.have.property('totalElements');",
+                      "    pm.expect(data.data).to.have.property('totalPages');",
+                      "    pm.expect(data.data).to.have.property('size');",
+                      "    pm.expect(data.data).to.have.property('number');",
+                      "    pm.expect(Array.isArray(data.data.content)).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/books?page=0&size=20&sort=id,desc",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "books"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "id,desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Kitablar (Books) by ID - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Response has data', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.success).to.be.true;",
+                      "    pm.expect(data.data).to.have.property('id');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/books/{{book_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "books",
+                    "{{book_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Kitablar (Books) by ID - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/books/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "books",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Kitablar (Books) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"title\": \"\\u00dc\\u00e7ippy\\u015fq - Yeni N\\u0259\\u015fr\", \"pageCount\": 400}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/books/{{book_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "books",
+                    "{{book_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Kitablar (Books) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"title\": \"\\u00dc\\u00e7ippy\\u015fq - Yeni N\\u0259\\u015fr\", \"pageCount\": 400}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/books/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "books",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Kitablar (Books) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/books/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "books",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Kitab Nüsxələri (Book Copies)",
+          "item": [
+            {
+              "name": "Create Kitab Nüsxələri (Book Copies) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    var data = pm.response.json();",
+                      "    if (data.success && data.data && data.data.id) {",
+                      "        pm.environment.set('BookCopy_id', data.data.id);",
+                      "        console.log('BookCopy_id captured: ' + data.data.id);",
+                      "    }",
+                      "}",
+                      "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"barcode\": \"BK-2026-001\", \"shelfLocation\": \"A-3-12\", \"condition\": \"NEW\", \"bookId\": 1}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/book-copies",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "book-copies"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Kitab Nüsxələri (Book Copies) - Validation Error",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Returns Problem Details', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data).to.have.property('status');",
+                      "    pm.expect(data.status).to.equal(400);",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"barcode\": \"\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/book-copies",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "book-copies"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Bookcopys (Paginated) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Pagination structure valid', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.data).to.have.property('content');",
+                      "    pm.expect(data.data).to.have.property('totalElements');",
+                      "    pm.expect(data.data).to.have.property('totalPages');",
+                      "    pm.expect(data.data).to.have.property('size');",
+                      "    pm.expect(data.data).to.have.property('number');",
+                      "    pm.expect(Array.isArray(data.data.content)).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/book-copies?page=0&size=20&sort=id,desc",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "book-copies"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "id,desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Kitab Nüsxələri (Book Copies) by ID - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Response has data', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.success).to.be.true;",
+                      "    pm.expect(data.data).to.have.property('id');",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/book-copies/{{book_copy_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "book-copies",
+                    "{{book_copy_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Kitab Nüsxələri (Book Copies) by ID - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/book-copies/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "book-copies",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Kitab Nüsxələri (Book Copies) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"shelfLocation\": \"B-1-05\", \"condition\": \"GOOD\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/book-copies/{{book_copy_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "book-copies",
+                    "{{book_copy_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Kitab Nüsxələri (Book Copies) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"shelfLocation\": \"B-1-05\", \"condition\": \"GOOD\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/book-copies/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "book-copies",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Kitab Nüsxələri (Book Copies) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/book-copies/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "book-copies",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Borclanmalar (Loans)",
+          "item": [
+            {
+              "name": "Create Borclanmalar (Loans) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    var data = pm.response.json();",
+                      "    if (data.success && data.data && data.data.id) {",
+                      "        pm.environment.set('Loan_id', data.data.id);",
+                      "        console.log('Loan_id captured: ' + data.data.id);",
+                      "    }",
+                      "}",
+                      "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"bookCopyId\": 1,\n    \"memberId\": 1,\n    \"dueDate\": \"2026-08-15\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/loans",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "loans"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Borclanmalar (Loans) - Validation Error",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Returns Problem Details', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data).to.have.property('status');",
+                      "    pm.expect(data.status).to.equal(400);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"bookCopyId\": null, \"memberId\": null, \"dueDate\": null}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/loans",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "loans"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Loans (Paginated) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Pagination structure valid', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.data).to.have.property('content');",
+                      "    pm.expect(data.data).to.have.property('totalElements');",
+                      "    pm.expect(data.data).to.have.property('totalPages');",
+                      "    pm.expect(data.data).to.have.property('size');",
+                      "    pm.expect(data.data).to.have.property('number');",
+                      "    pm.expect(Array.isArray(data.data.content)).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/loans?page=0&size=20&sort=id,desc",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "loans"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "id,desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Borclanmalar (Loans) by ID - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Response has data', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.success).to.be.true;",
+                      "    pm.expect(data.data).to.have.property('id');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/loans/{{loan_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "loans",
+                    "{{loan_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Borclanmalar (Loans) by ID - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/loans/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "loans",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Borclanmalar (Loans) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"dueDate\": \"2026-09-01\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/loans/{{loan_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "loans",
+                    "{{loan_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Borclanmalar (Loans) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"dueDate\": \"2026-09-01\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/loans/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "loans",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Borclanmalar (Loans) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/loans/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "loans",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Cərimələr (Fines)",
+          "item": [
+            {
+              "name": "Create Cərimələr (Fines) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    var data = pm.response.json();",
+                      "    if (data.success && data.data && data.data.id) {",
+                      "        pm.environment.set('Fine_id', data.data.id);",
+                      "        console.log('Fine_id captured: ' + data.data.id);",
+                      "    }",
+                      "}",
+                      "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"amount\": 25.5, \"reason\": \"Gecikmi\\u015f qay\\u0131tma\", \"type\": \"LATE_RETURN\", \"loanId\": 1, \"memberId\": 1}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/fines",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "fines"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Cərimələr (Fines) - Validation Error",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Returns Problem Details', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data).to.have.property('status');",
+                      "    pm.expect(data.status).to.equal(400);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"amount\": -5, \"reason\": \"\", \"type\": \"\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/fines",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "fines"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Fines (Paginated) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Pagination structure valid', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.data).to.have.property('content');",
+                      "    pm.expect(data.data).to.have.property('totalElements');",
+                      "    pm.expect(data.data).to.have.property('totalPages');",
+                      "    pm.expect(data.data).to.have.property('size');",
+                      "    pm.expect(data.data).to.have.property('number');",
+                      "    pm.expect(Array.isArray(data.data.content)).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/fines?page=0&size=20&sort=id,desc",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "fines"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "id,desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Cərimələr (Fines) by ID - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Response has data', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.success).to.be.true;",
+                      "    pm.expect(data.data).to.have.property('id');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/fines/{{fine_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "fines",
+                    "{{fine_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Cərimələr (Fines) by ID - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/fines/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "fines",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Cərimələr (Fines) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"amount\": 30.0, \"reason\": \"Z\\u0259d\\u0259l\\u0259nmi\\u015f kitab\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/fines/{{fine_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "fines",
+                    "{{fine_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Cərimələr (Fines) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"amount\": 30.0, \"reason\": \"Z\\u0259d\\u0259l\\u0259nmi\\u015f kitab\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/fines/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "fines",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Cərimələr (Fines) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/fines/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "fines",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Rezervasiyalar (Reservations)",
+          "item": [
+            {
+              "name": "Create Rezervasiyalar (Reservations) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    var data = pm.response.json();",
+                      "    if (data.success && data.data && data.data.id) {",
+                      "        pm.environment.set('Reservation_id', data.data.id);",
+                      "        console.log('Reservation_id captured: ' + data.data.id);",
+                      "    }",
+                      "}",
+                      "pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"bookId\": 1, \"memberId\": 1, \"expiryDate\": \"2026-08-01\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/reservations",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "reservations"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Rezervasiyalar (Reservations) - Validation Error",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Returns Problem Details', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data).to.have.property('status');",
+                      "    pm.expect(data.status).to.equal(400);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"bookId\": null, \"memberId\": null, \"expiryDate\": null}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/reservations",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "reservations"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Reservations (Paginated) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Pagination structure valid', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.data).to.have.property('content');",
+                      "    pm.expect(data.data).to.have.property('totalElements');",
+                      "    pm.expect(data.data).to.have.property('totalPages');",
+                      "    pm.expect(data.data).to.have.property('size');",
+                      "    pm.expect(data.data).to.have.property('number');",
+                      "    pm.expect(Array.isArray(data.data.content)).to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/reservations?page=0&size=20&sort=id,desc",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "reservations"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "id,desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Rezervasiyalar (Reservations) by ID - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));",
+                      "pm.test('Response has data', () => {",
+                      "    var data = pm.response.json();",
+                      "    pm.expect(data.success).to.be.true;",
+                      "    pm.expect(data.data).to.have.property('id');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/reservations/{{reservation_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "reservations",
+                    "{{reservation_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Rezervasiyalar (Reservations) by ID - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/reservations/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "reservations",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Rezervasiyalar (Reservations) - KPI",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"expiryDate\": \"2026-09-01\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/reservations/{{reservation_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "reservations",
+                    "{{reservation_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Rezervasiyalar (Reservations) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"expiryDate\": \"2026-09-01\"}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/reservations/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "reservations",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Rezervasiyalar (Reservations) - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Response time < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/{{api_version}}/reservations/999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "{{api_version}}",
+                    "reservations",
+                    "999999"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ],
+      "description": "Öncəliklə Author, Publisher, Category, Member, Book, BookCopy yaradılır. Sonra Loan, Fine, Reservation."
+    }
+  ]
+}

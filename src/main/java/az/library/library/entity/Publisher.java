@@ -43,7 +43,7 @@ public class Publisher extends BaseEntity {
     @Column(length = 200)
     private String website;
 
-    @OneToMany(mappedBy = "publisher", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "publisher", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Book> books = new ArrayList<>();
 }

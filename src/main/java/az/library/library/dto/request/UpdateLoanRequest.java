@@ -1,5 +1,7 @@
 package az.library.library.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
@@ -11,8 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "Borcalma məlumatlarını yeniləmək üçün sorğu")
 public class UpdateLoanRequest {
 
+    @Schema(description = "Yeni qayıtma tarixi (yyyy-MM-dd)", example = "2026-09-01")
     private LocalDate dueDate;
 
 }

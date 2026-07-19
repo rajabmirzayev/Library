@@ -87,7 +87,7 @@ public class Book extends BaseEntity {
     @Builder.Default
     private List<BookCopy> copies = new ArrayList<>();
 
-    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Reservation> reservations = new ArrayList<>();
 }

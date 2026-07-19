@@ -49,14 +49,14 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
-    @ExceptionHandler(Exception.class)
-    public ProblemDetail handleGeneric(Exception ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Gözlənilməz xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin");
-        problem.setTitle("Daxili server xətası");
-        problem.setType(URI.create("/errors/internal-server-error"));
-        return problem;
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ProblemDetail handleGeneric(Exception ex) {
+//        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+//                HttpStatus.INTERNAL_SERVER_ERROR,
+//                "Gözlənilməz xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin");
+//        problem.setTitle("Daxili server xətası");
+//        problem.setType(URI.create("/errors/internal-server-error"));
+//        return problem;
+//    }
 
 }
