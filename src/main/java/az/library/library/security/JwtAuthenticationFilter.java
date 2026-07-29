@@ -3,6 +3,8 @@ package az.library.library.security;
 import az.library.library.entity.User;
 import az.library.library.repository.UserRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,26 +41,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
-        if (!jwtService.isTokenValid(token)) {
+        try {
+            Claims claims = jwtService.parseToken(token);
+            Long userId = Long.valueOf(claims.getSubject());
+
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) {
+                SecurityContextHolder.clearContext();
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(user, null, List.of(authority));
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
-            return;
-        }
 
-        Claims claims = jwtService.parseToken(token);
-        Long userId = Long.valueOf(claims.getSubject());
-
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
+        } catch (ExpiredJwtException e) {
+            SecurityContextHolder.clearContext();
             filterChain.doFilter(request, response);
-            return;
+
+        } catch (SignatureException e) {
+            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
+
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
         }
-
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(user, null, List.of(authority));
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        filterChain.doFilter(request, response);
     }
 }
