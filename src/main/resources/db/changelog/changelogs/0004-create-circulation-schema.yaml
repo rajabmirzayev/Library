@@ -1,0 +1,389 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0004-01-create-book-copies-table
+      author: rajabmirzayev
+      description: Create book_copies table
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: book_copies
+      changes:
+        - createTable:
+            tableName: book_copies
+            remarks: Physical copies of a book (one book has many copies)
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: barcode
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: shelf_location
+                  type: varchar(100)
+              - column:
+                  name: condition
+                  type: varchar(20)
+                  defaultValue: NEW
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: AVAILABLE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: book_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: book_copies
+            indexName: idx_book_copy_barcode
+            unique: true
+            columns:
+              - column:
+                  name: barcode
+        - createIndex:
+            tableName: book_copies
+            indexName: idx_book_copy_status
+            columns:
+              - column:
+                  name: status
+        - createIndex:
+            tableName: book_copies
+            indexName: idx_book_copy_book_id
+            columns:
+              - column:
+                  name: book_id
+        - addForeignKeyConstraint:
+            baseTableName: book_copies
+            baseColumnNames: book_id
+            constraintName: fk_book_copies_book
+            referencedTableName: books
+            referencedColumnNames: id
+
+  - changeSet:
+      id: 0004-02-create-reservations-table
+      author: rajabmirzayev
+      description: Create reservations table
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: reservations
+      changes:
+        - createTable:
+            tableName: reservations
+            remarks: Book reservations
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: reservation_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expiry_date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: queue_position
+                  type: int
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: PENDING
+                  constraints:
+                    nullable: false
+              - column:
+                  name: book_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: member_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: reservations
+            indexName: idx_reservation_status
+            columns:
+              - column:
+                  name: status
+        - createIndex:
+            tableName: reservations
+            indexName: idx_reservation_member_id
+            columns:
+              - column:
+                  name: member_id
+        - createIndex:
+            tableName: reservations
+            indexName: idx_reservation_book_id
+            columns:
+              - column:
+                  name: book_id
+        - createIndex:
+            tableName: reservations
+            indexName: idx_reservation_expiry_date
+            columns:
+              - column:
+                  name: expiry_date
+        - addForeignKeyConstraint:
+            baseTableName: reservations
+            baseColumnNames: book_id
+            constraintName: fk_reservations_book
+            referencedTableName: books
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: reservations
+            baseColumnNames: member_id
+            constraintName: fk_reservations_member
+            referencedTableName: members
+            referencedColumnNames: id
+
+  - changeSet:
+      id: 0004-03-create-loans-table
+      author: rajabmirzayev
+      description: Create loans table
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: loans
+      changes:
+        - createTable:
+            tableName: loans
+            remarks: Book copy loans to members
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: loan_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: due_date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: return_date
+                  type: timestamp
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: book_copy_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: member_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: loans
+            indexName: idx_loan_status
+            columns:
+              - column:
+                  name: status
+        - createIndex:
+            tableName: loans
+            indexName: idx_loan_due_date
+            columns:
+              - column:
+                  name: due_date
+        - createIndex:
+            tableName: loans
+            indexName: idx_loan_member_id
+            columns:
+              - column:
+                  name: member_id
+        - createIndex:
+            tableName: loans
+            indexName: idx_loan_book_copy_id
+            columns:
+              - column:
+                  name: book_copy_id
+        - addForeignKeyConstraint:
+            baseTableName: loans
+            baseColumnNames: book_copy_id
+            constraintName: fk_loans_book_copy
+            referencedTableName: book_copies
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: loans
+            baseColumnNames: member_id
+            constraintName: fk_loans_member
+            referencedTableName: members
+            referencedColumnNames: id
+
+  - changeSet:
+      id: 0004-04-create-fines-table
+      author: rajabmirzayev
+      description: Create fines table
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: fines
+      changes:
+        - createTable:
+            tableName: fines
+            remarks: Fines applied to members/loans
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: amount
+                  type: decimal(10,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reason
+                  type: varchar(500)
+              - column:
+                  name: type
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: PENDING
+                  constraints:
+                    nullable: false
+              - column:
+                  name: issued_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: paid_date
+                  type: timestamp
+              - column:
+                  name: loan_id
+                  type: bigint
+              - column:
+                  name: member_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: fines
+            indexName: idx_fine_status
+            columns:
+              - column:
+                  name: status
+        - createIndex:
+            tableName: fines
+            indexName: idx_fine_member_id
+            columns:
+              - column:
+                  name: member_id
+        - createIndex:
+            tableName: fines
+            indexName: idx_fine_loan_id
+            columns:
+              - column:
+                  name: loan_id
+        - addForeignKeyConstraint:
+            baseTableName: fines
+            baseColumnNames: loan_id
+            constraintName: fk_fines_loan
+            referencedTableName: loans
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: fines
+            baseColumnNames: member_id
+            constraintName: fk_fines_member
+            referencedTableName: members
+            referencedColumnNames: id

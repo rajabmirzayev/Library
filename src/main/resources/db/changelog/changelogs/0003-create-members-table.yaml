@@ -1,0 +1,105 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0003-01-create-members-table
+      author: rajabmirzayev
+      description: Create members table
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: members
+      changes:
+        - createTable:
+            tableName: members
+            remarks: Library members
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone
+                  type: varchar(20)
+              - column:
+                  name: address
+                  type: varchar(500)
+              - column:
+                  name: membership_number
+                  type: varchar(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: membership_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_of_birth
+                  type: date
+              - column:
+                  name: gender
+                  type: varchar(10)
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: members
+            indexName: idx_member_email
+            unique: true
+            columns:
+              - column:
+                  name: email
+        - createIndex:
+            tableName: members
+            indexName: idx_member_membership_number
+            unique: true
+            columns:
+              - column:
+                  name: membership_number
+        - createIndex:
+            tableName: members
+            indexName: idx_member_phone
+            columns:
+              - column:
+                  name: phone
+        - createIndex:
+            tableName: members
+            indexName: idx_member_status
+            columns:
+              - column:
+                  name: status

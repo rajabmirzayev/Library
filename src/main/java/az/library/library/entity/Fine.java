@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@ToString(callSuper = true, onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "fines", indexes = {
         @Index(name = "idx_fine_status", columnList = "status"),
@@ -28,26 +29,32 @@ public class Fine extends BaseEntity {
     @NotNull(message = "Fine amount is required")
     @Positive(message = "Fine amount must be positive")
     @Column(nullable = false, precision = 10, scale = 2)
+    @ToString.Include
     private BigDecimal amount;
 
     @Column(length = 500)
+    @ToString.Include
     private String reason;
 
     @NotNull(message = "Fine type is required")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
+    @ToString.Include
     private FineType type;
 
     @NotNull(message = "Fine status is required")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
+    @ToString.Include
     private FineStatus status = FineStatus.PENDING;
 
     @Column(name = "issued_date", nullable = false)
+    @ToString.Include
     private LocalDateTime issuedDate;
 
     @Column(name = "paid_date")
+    @ToString.Include
     private LocalDateTime paidDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -57,4 +64,17 @@ public class Fine extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Fine)) return false;
+        Fine other = (Fine) o;
+        return getId() != null && getId().equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

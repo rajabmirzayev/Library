@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - include:
+      file: changelogs/0001-create-users-table.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changelogs/0002-create-catalog-schema.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changelogs/0003-create-members-table.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changelogs/0004-create-circulation-schema.yaml
+      relativeToChangelogFile: true

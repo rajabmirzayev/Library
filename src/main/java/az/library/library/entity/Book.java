@@ -19,6 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@ToString(callSuper = true, onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "books", indexes = {
         @Index(name = "idx_book_isbn", columnList = "isbn", unique = true),
@@ -30,35 +31,43 @@ public class Book extends BaseEntity {
     @NotBlank(message = "Book title is required")
     @Size(max = 300, message = "Title must not exceed 300 characters")
     @Column(nullable = false, length = 300)
+    @ToString.Include
     private String title;
 
     @NotBlank(message = "ISBN is required")
     @Size(min = 10, max = 17, message = "ISBN must be between 10 and 17 characters")
     @Column(nullable = false, unique = true, length = 17)
+    @ToString.Include
     private String isbn;
 
     @Column(name = "publication_year")
+    @ToString.Include
     private Integer publicationYear;
 
     @Size(max = 50, message = "Edition must not exceed 50 characters")
     @Column(length = 50)
+    @ToString.Include
     private String edition;
 
     @Column(name = "page_count")
+    @ToString.Include
     private Integer pageCount;
 
     @Size(max = 50, message = "Language must not exceed 50 characters")
     @Column(length = 50)
+    @ToString.Include
     private String language;
 
     @Size(max = 5000, message = "Summary must not exceed 5000 characters")
     @Column(length = 5000)
+    @ToString.Include
     private String summary;
 
     @NotNull(message = "Book status is required")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
+    @ToString.Include
     private BookStatus status = BookStatus.AVAILABLE;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -90,4 +99,17 @@ public class Book extends BaseEntity {
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Reservation> reservations = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Book)) return false;
+        Book other = (Book) o;
+        return getId() != null && getId().equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

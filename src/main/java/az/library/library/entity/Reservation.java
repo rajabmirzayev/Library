@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@ToString(callSuper = true, onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "reservations", indexes = {
         @Index(name = "idx_reservation_status", columnList = "status"),
@@ -25,19 +26,23 @@ public class Reservation extends BaseEntity {
 
     @NotNull(message = "Reservation date is required")
     @Column(name = "reservation_date", nullable = false)
+    @ToString.Include
     private LocalDateTime reservationDate;
 
     @NotNull(message = "Expiry date is required")
     @Column(name = "expiry_date", nullable = false)
+    @ToString.Include
     private LocalDate expiryDate;
 
     @Column(name = "queue_position")
+    @ToString.Include
     private Integer queuePosition;
 
     @NotNull(message = "Reservation status is required")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
+    @ToString.Include
     private ReservationStatus status = ReservationStatus.PENDING;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,4 +52,17 @@ public class Reservation extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Reservation)) return false;
+        Reservation other = (Reservation) o;
+        return getId() != null && getId().equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

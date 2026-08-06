@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@ToString(callSuper = true, onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "loans", indexes = {
         @Index(name = "idx_loan_status", columnList = "status"),
@@ -27,19 +28,23 @@ public class Loan extends BaseEntity {
 
     @NotNull(message = "Loan date is required")
     @Column(name = "loan_date", nullable = false)
+    @ToString.Include
     private LocalDateTime loanDate;
 
     @NotNull(message = "Due date is required")
     @Column(name = "due_date", nullable = false)
+    @ToString.Include
     private LocalDate dueDate;
 
     @Column(name = "return_date")
+    @ToString.Include
     private LocalDateTime returnDate;
 
     @NotNull(message = "Loan status is required")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
+    @ToString.Include
     private LoanStatus status = LoanStatus.ACTIVE;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -53,4 +58,17 @@ public class Loan extends BaseEntity {
     @OneToMany(mappedBy = "loan", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
     private List<Fine> fines = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Loan)) return false;
+        Loan other = (Loan) o;
+        return getId() != null && getId().equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

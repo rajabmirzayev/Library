@@ -1,0 +1,363 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0002-01-create-authors-table
+      author: rajabmirzayev
+      description: Create authors table
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: authors
+      changes:
+        - createTable:
+            tableName: authors
+            remarks: Book authors
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: biography
+                  type: varchar(2000)
+              - column:
+                  name: birth_date
+                  type: date
+              - column:
+                  name: nationality
+                  type: varchar(100)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: authors
+            indexName: idx_author_name
+            columns:
+              - column:
+                  name: first_name
+              - column:
+                  name: last_name
+
+  - changeSet:
+      id: 0002-02-create-publishers-table
+      author: rajabmirzayev
+      description: Create publishers table
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: publishers
+      changes:
+        - createTable:
+            tableName: publishers
+            remarks: Book publishers
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: address
+                  type: varchar(500)
+              - column:
+                  name: phone
+                  type: varchar(20)
+              - column:
+                  name: email
+                  type: varchar(150)
+              - column:
+                  name: website
+                  type: varchar(200)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: publishers
+            indexName: idx_publisher_name
+            columns:
+              - column:
+                  name: name
+
+  - changeSet:
+      id: 0002-03-create-categories-table
+      author: rajabmirzayev
+      description: Create categories table with self-referencing hierarchy
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: categories
+      changes:
+        - createTable:
+            tableName: categories
+            remarks: Book categories (supports parent/child hierarchy)
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(500)
+              - column:
+                  name: parent_id
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: categories
+            indexName: idx_category_name
+            unique: true
+            columns:
+              - column:
+                  name: name
+        - addForeignKeyConstraint:
+            baseTableName: categories
+            baseColumnNames: parent_id
+            constraintName: fk_categories_parent
+            referencedTableName: categories
+            referencedColumnNames: id
+
+  - changeSet:
+      id: 0002-04-create-books-table
+      author: rajabmirzayev
+      description: Create books table
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: books
+      changes:
+        - createTable:
+            tableName: books
+            remarks: Books (one publisher has many books)
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(300)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: isbn
+                  type: varchar(17)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: publication_year
+                  type: int
+              - column:
+                  name: edition
+                  type: varchar(50)
+              - column:
+                  name: page_count
+                  type: int
+              - column:
+                  name: language
+                  type: varchar(50)
+              - column:
+                  name: summary
+                  type: varchar(5000)
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: AVAILABLE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: publisher_id
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: books
+            indexName: idx_book_isbn
+            unique: true
+            columns:
+              - column:
+                  name: isbn
+        - createIndex:
+            tableName: books
+            indexName: idx_book_title
+            columns:
+              - column:
+                  name: title
+        - createIndex:
+            tableName: books
+            indexName: idx_book_status
+            columns:
+              - column:
+                  name: status
+        - addForeignKeyConstraint:
+            baseTableName: books
+            baseColumnNames: publisher_id
+            constraintName: fk_books_publisher
+            referencedTableName: publishers
+            referencedColumnNames: id
+
+  - changeSet:
+      id: 0002-05-create-book-authors-table
+      author: rajabmirzayev
+      description: "Create book_authors join table (Many-to-Many: Book <-> Author)"
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: book_authors
+      changes:
+        - createTable:
+            tableName: book_authors
+            remarks: Join table for Book <-> Author many-to-many relationship
+            columns:
+              - column:
+                  name: book_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: author_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: book_authors
+            constraintName: pk_book_authors
+            columnNames: book_id, author_id
+        - addForeignKeyConstraint:
+            baseTableName: book_authors
+            baseColumnNames: book_id
+            constraintName: fk_book_authors_book
+            referencedTableName: books
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: book_authors
+            baseColumnNames: author_id
+            constraintName: fk_book_authors_author
+            referencedTableName: authors
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+  - changeSet:
+      id: 0002-06-create-book-categories-table
+      author: rajabmirzayev
+      description: "Create book_categories join table (Many-to-Many: Book <-> Category)"
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: book_categories
+      changes:
+        - createTable:
+            tableName: book_categories
+            remarks: Join table for Book <-> Category many-to-many relationship
+            columns:
+              - column:
+                  name: book_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: book_categories
+            constraintName: pk_book_categories
+            columnNames: book_id, category_id
+        - addForeignKeyConstraint:
+            baseTableName: book_categories
+            baseColumnNames: book_id
+            constraintName: fk_book_categories_book
+            referencedTableName: books
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: book_categories
+            baseColumnNames: category_id
+            constraintName: fk_book_categories_category
+            referencedTableName: categories
+            referencedColumnNames: id
+            onDelete: CASCADE

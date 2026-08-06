@@ -17,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@ToString(callSuper = true, onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "book_copies", indexes = {
         @Index(name = "idx_book_copy_barcode", columnList = "barcode", unique = true),
@@ -28,22 +29,26 @@ public class BookCopy extends BaseEntity {
     @NotBlank(message = "Barcode is required")
     @Size(max = 50, message = "Barcode must not exceed 50 characters")
     @Column(nullable = false, unique = true, length = 50)
+    @ToString.Include
     private String barcode;
 
     @Size(max = 100, message = "Shelf location must not exceed 100 characters")
     @Column(name = "shelf_location", length = 100)
+    @ToString.Include
     private String shelfLocation;
 
     @NotNull(message = "Copy condition is required")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
+    @ToString.Include
     private BookCopyCondition condition = BookCopyCondition.NEW;
 
     @NotNull(message = "Copy status is required")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
+    @ToString.Include
     private BookCopyStatus status = BookCopyStatus.AVAILABLE;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -53,4 +58,17 @@ public class BookCopy extends BaseEntity {
     @OneToMany(mappedBy = "bookCopy", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
     private List<Loan> loans = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BookCopy)) return false;
+        BookCopy other = (BookCopy) o;
+        return getId() != null && getId().equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
