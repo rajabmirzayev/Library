@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, rollbackFor = Exception.class)
 public class LoanServiceImpl implements LoanService {
     private final LoanRepository repo;
     private final BookCopyRepository bookCopyRepo;
@@ -34,7 +34,7 @@ public class LoanServiceImpl implements LoanService {
     private final LoanMapper mapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public LoanDetailedResponse create(CreateLoanRequest request) {
         BookCopy bookCopy = bookCopyRepo.findById(request.getBookCopyId())
                 .orElseThrow(() -> new ResourceNotFoundException("BookCopy", request.getBookCopyId()));
@@ -64,7 +64,7 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public LoanDetailedResponse update(Long id, UpdateLoanRequest request) {
         Loan entity = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Loan", id));
         if (request.getDueDate() != null) entity.setDueDate(request.getDueDate());
@@ -72,7 +72,7 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         Loan entity = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Loan", id));
         if (entity.getBookCopy() != null) {

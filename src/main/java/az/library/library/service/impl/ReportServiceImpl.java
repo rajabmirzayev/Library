@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, rollbackFor = Exception.class)
 public class ReportServiceImpl implements ReportService {
 
     private final ReportRepository reportRepository;

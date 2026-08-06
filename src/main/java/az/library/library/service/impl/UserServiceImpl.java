@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, rollbackFor = Exception.class)
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repo;
@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public UserDetailedResponse register(RegisterUserRequest request) {
         if (repo.existsByUsername(request.getUsername()))
             throw new IllegalArgumentException("Username " + request.getUsername() + " already exists");

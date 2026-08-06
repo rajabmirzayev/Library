@@ -17,13 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, rollbackFor = Exception.class)
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository repo;
     private final CategoryMapper mapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public CategoryDetailedResponse create(CreateCategoryRequest request) {
         var entity = mapper.toEntityForCreate(request);
         if (request.getParentId() != null)
@@ -44,7 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public CategoryDetailedResponse update(Long id, UpdateCategoryRequest request) {
         var entity = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category", id));
         mapper.updateEntity(request, entity);
@@ -55,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         repo.delete(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category", id)));
     }

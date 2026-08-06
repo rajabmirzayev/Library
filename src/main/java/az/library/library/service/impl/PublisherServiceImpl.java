@@ -17,13 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, rollbackFor = Exception.class)
 public class PublisherServiceImpl implements PublisherService {
     private final PublisherRepository repo;
     private final PublisherMapper mapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public PublisherDetailedResponse create(CreatePublisherRequest request) {
         return mapper.toDetailedResponse(repo.save(mapper.toEntityForCreate(request)));
     }
@@ -40,7 +40,7 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public PublisherDetailedResponse update(Long id, UpdatePublisherRequest request) {
         var entity = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Publisher", id));
         mapper.updateEntity(request, entity);
@@ -48,7 +48,7 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         repo.delete(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Publisher", id)));
     }

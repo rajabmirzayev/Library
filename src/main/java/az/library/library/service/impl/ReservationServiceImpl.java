@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, rollbackFor = Exception.class)
 public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository repo;
     private final BookRepository bookRepo;
@@ -33,7 +33,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationMapper mapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ReservationDetailedResponse create(CreateReservationRequest request) {
         Book book = bookRepo.findById(request.getBookId())
                 .orElseThrow(() -> new ResourceNotFoundException("Book", request.getBookId()));
@@ -60,7 +60,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ReservationDetailedResponse update(Long id, UpdateReservationRequest request) {
         Reservation entity = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Reservation", id));
         if (request.getExpiryDate() != null) entity.setExpiryDate(request.getExpiryDate());
@@ -68,7 +68,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         repo.delete(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Reservation", id)));
     }

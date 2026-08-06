@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, rollbackFor = Exception.class)
 public class FineServiceImpl implements FineService {
     private final FineRepository repo;
     private final LoanRepository loanRepo;
@@ -31,7 +31,7 @@ public class FineServiceImpl implements FineService {
     private final FineMapper mapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public FineDetailedResponse create(CreateFineRequest request) {
         memberRepo.findById(request.getMemberId())
                 .orElseThrow(() -> new ResourceNotFoundException("Member", request.getMemberId()));
@@ -56,7 +56,7 @@ public class FineServiceImpl implements FineService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public FineDetailedResponse update(Long id, UpdateFineRequest request) {
         Fine entity = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Fine", id));
         if (request.getAmount() != null) entity.setAmount(request.getAmount());
@@ -65,7 +65,7 @@ public class FineServiceImpl implements FineService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         repo.delete(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Fine", id)));
     }

@@ -21,14 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, rollbackFor = Exception.class)
 public class BookCopyServiceImpl implements BookCopyService {
     private final BookCopyRepository repo;
     private final BookRepository bookRepo;
     private final BookCopyMapper mapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public BookCopyDetailedResponse create(CreateBookCopyRequest request) {
         if (repo.existsByBarcode(request.getBarcode()))
             throw new IllegalArgumentException("Barcode " + request.getBarcode() + " already exists");
@@ -52,7 +52,7 @@ public class BookCopyServiceImpl implements BookCopyService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public BookCopyDetailedResponse update(Long id, UpdateBookCopyRequest request) {
         BookCopy entity = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("BookCopy", id));
         if (request.getBarcode() != null) {
@@ -70,7 +70,7 @@ public class BookCopyServiceImpl implements BookCopyService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         repo.delete(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("BookCopy", id)));
     }

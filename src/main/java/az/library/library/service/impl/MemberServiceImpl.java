@@ -21,13 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, rollbackFor = Exception.class)
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository repo;
     private final MemberMapper mapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public MemberDetailedResponse create(CreateMemberRequest request) {
         if (repo.existsByEmail(request.getEmail()))
             throw new IllegalArgumentException("Email " + request.getEmail() + " already exists");
@@ -50,7 +50,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public MemberDetailedResponse update(Long id, UpdateMemberRequest request) {
         Member entity = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Member", id));
         if (request.getEmail() != null && !entity.getEmail().equals(request.getEmail()) && repo.existsByEmail(request.getEmail()))
@@ -60,7 +60,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         repo.delete(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Member", id)));
     }

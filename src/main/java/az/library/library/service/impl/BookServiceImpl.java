@@ -26,7 +26,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, rollbackFor = Exception.class)
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
@@ -36,7 +36,7 @@ public class BookServiceImpl implements BookService {
     private final BookMapper bookMapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public BookDetailedResponse create(CreateBookRequest request) {
         if (bookRepository.existsByIsbn(request.getIsbn()))
             throw new IllegalArgumentException("Book with ISBN " + request.getIsbn() + " already exists");
@@ -73,7 +73,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public BookDetailedResponse update(Long id, UpdateBookRequest request) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book", id));
@@ -106,7 +106,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         bookRepository.delete(bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book", id)));
