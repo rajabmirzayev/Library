@@ -786,6 +786,131 @@
           "response": []
         },
         {
+          "name": "Search Books (Dynamic Specification)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "const body = pm.response.json();",
+                  "pm.test(\"Response success is true\", () => pm.expect(body.success).to.eql(true));",
+                  "pm.test(\"Content is an array\", () => pm.expect(body.data.content).to.be.an(\"array\"));",
+                  "pm.test(\"Each item has required fields\", () => {",
+                  "    body.data.content.forEach(r => {",
+                  "        pm.expect(r).to.have.property(\"id\");",
+                  "        pm.expect(r.title).to.be.a(\"string\");",
+                  "        pm.expect(r).to.have.property(\"isbn\");",
+                  "        pm.expect(r.status).to.be.a(\"string\");",
+                  "        pm.expect(r.publisherName).to.be.a(\"string\");",
+                  "        pm.expect(r.authorNames).to.be.a(\"string\");",
+                  "    });",
+                  "});",
+                  "pm.test(\"Pagination fields are present\", () => {",
+                  "    pm.expect(body.data).to.have.property(\"totalElements\");",
+                  "    pm.expect(body.data).to.have.property(\"totalPages\");",
+                  "    pm.expect(body.data.page).to.be.a(\"number\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/books/search?title=&authorId=&categoryId=&publisherId=&isbn=&minPrice=&maxPrice=&startYear=&endYear=&page=0&size=20&sort=id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "books",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "title",
+                  "value": "",
+                  "description": "Kitab adında axtarış"
+                },
+                {
+                  "key": "authorId",
+                  "value": "",
+                  "description": "Müəllif ID-si ilə filtr",
+                  "disabled": true
+                },
+                {
+                  "key": "categoryId",
+                  "value": "",
+                  "description": "Kateqoriya ID-si ilə filtr",
+                  "disabled": true
+                },
+                {
+                  "key": "publisherId",
+                  "value": "",
+                  "description": "Nəşriyyat ID-si ilə filtr",
+                  "disabled": true
+                },
+                {
+                  "key": "isbn",
+                  "value": "",
+                  "description": "ISBN ilə dəqiq axtarış",
+                  "disabled": true
+                },
+                {
+                  "key": "minPrice",
+                  "value": "",
+                  "description": "Minimum qiymət (AZN)",
+                  "disabled": true
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "",
+                  "description": "Maksimum qiymət (AZN)",
+                  "disabled": true
+                },
+                {
+                  "key": "startYear",
+                  "value": "",
+                  "description": "Başlanğıc nəşr ili",
+                  "disabled": true
+                },
+                {
+                  "key": "endYear",
+                  "value": "",
+                  "description": "Son nəşr ili",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Səhifə nömrəsi"
+                },
+                {
+                  "key": "size",
+                  "value": "20",
+                  "description": "Səhifə ölçüsü"
+                },
+                {
+                  "key": "sort",
+                  "value": "id",
+                  "description": "Sıralama"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Delete Book",
           "event": [
             {
@@ -1862,8 +1987,15 @@
             },
             "url": {
               "raw": "{{base_url}}/api/{{api_version}}/auth/register",
-              "host": ["{{base_url}}"],
-              "path": ["api", "{{api_version}}", "auth", "register"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "auth",
+                "register"
+              ]
             }
           },
           "response": []
@@ -1902,8 +2034,15 @@
             },
             "url": {
               "raw": "{{base_url}}/api/{{api_version}}/auth/login",
-              "host": ["{{base_url}}"],
-              "path": ["api", "{{api_version}}", "auth", "login"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "auth",
+                "login"
+              ]
             }
           },
           "response": []
@@ -1936,8 +2075,15 @@
             ],
             "url": {
               "raw": "{{base_url}}/api/{{api_version}}/user/profile",
-              "host": ["{{base_url}}"],
-              "path": ["api", "{{api_version}}", "user", "profile"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "user",
+                "profile"
+              ]
             }
           },
           "response": []
@@ -1970,8 +2116,15 @@
             ],
             "url": {
               "raw": "{{base_url}}/api/{{api_version}}/admin/dashboard",
-              "host": ["{{base_url}}"],
-              "path": ["api", "{{api_version}}", "admin", "dashboard"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "admin",
+                "dashboard"
+              ]
             }
           },
           "response": []
@@ -2017,7 +2170,9 @@
             },
             "url": {
               "raw": "{{base_url}}/api/{{api_version}}/auth/login",
-              "host": ["{{base_url}}"],
+              "host": [
+                "{{base_url}}"
+              ],
               "path": [
                 "api",
                 "{{api_version}}",
@@ -2073,7 +2228,9 @@
             ],
             "url": {
               "raw": "{{base_url}}/api/{{api_version}}/reports/overview",
-              "host": ["{{base_url}}"],
+              "host": [
+                "{{base_url}}"
+              ],
               "path": [
                 "api",
                 "{{api_version}}",
@@ -2128,7 +2285,9 @@
             ],
             "url": {
               "raw": "{{base_url}}/api/{{api_version}}/reports/most-borrowed-books?limit=5",
-              "host": ["{{base_url}}"],
+              "host": [
+                "{{base_url}}"
+              ],
               "path": [
                 "api",
                 "{{api_version}}",

@@ -1,5 +1,6 @@
 package az.library.library.service.impl;
 
+import az.library.library.dto.request.BookSearchCriteria;
 import az.library.library.dto.request.CreateBookRequest;
 import az.library.library.dto.request.UpdateBookRequest;
 import az.library.library.dto.response.BookDetailedResponse;
@@ -10,11 +11,13 @@ import az.library.library.entity.Category;
 import az.library.library.exception.ResourceNotFoundException;
 import az.library.library.mapper.BookMapper;
 import az.library.library.repository.*;
+import az.library.library.repository.specification.BookSpecification;
 import az.library.library.service.BookService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +64,12 @@ public class BookServiceImpl implements BookService {
     @Override
     public Page<BookSummaryResponse> findAll(Pageable pageable) {
         return bookRepository.findAll(pageable).map(bookMapper::toSummaryResponse);
+    }
+
+    @Override
+    public Page<BookSummaryResponse> search(BookSearchCriteria criteria, Pageable pageable) {
+        Specification<Book> spec = BookSpecification.build(criteria);
+        return bookRepository.findAll(spec, pageable).map(bookMapper::toSummaryResponse);
     }
 
     @Override

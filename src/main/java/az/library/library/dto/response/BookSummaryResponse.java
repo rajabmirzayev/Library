@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,7 +19,7 @@ public class BookSummaryResponse {
     @Schema(description = "Kitabın ID-si", example = "1")
     private Long id;
 
-    @Schema(description = "Kitabın adı", example = "Üçippyşq")
+    @Schema(description = "Kitabın adı", example = "Xəmsə")
     private String title;
 
     @Schema(description = "ISBN nömrəsi", example = "978-0-13-468599-1")
@@ -25,6 +27,12 @@ public class BookSummaryResponse {
 
     @Schema(description = "Status", example = "AVAILABLE")
     private BookStatus status;
+
+    @Schema(description = "Nəşr ili", example = "2024")
+    private Integer publicationYear;
+
+    @Schema(description = "Qiymət (AZN)", example = "25.50")
+    private BigDecimal price;
 
     @Schema(description = "Nəşriyyat adı", example = "Qanun Nəşriyyatı")
     private String publisherName;

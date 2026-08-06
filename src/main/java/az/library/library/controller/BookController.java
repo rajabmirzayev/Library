@@ -1,6 +1,7 @@
 package az.library.library.controller;
 
 import az.library.library.dto.ApiResponse;
+import az.library.library.dto.request.BookSearchCriteria;
 import az.library.library.dto.request.CreateBookRequest;
 import az.library.library.dto.request.UpdateBookRequest;
 import az.library.library.dto.response.BookDetailedResponse;
@@ -56,6 +57,16 @@ public class BookController {
     public ResponseEntity<ApiResponse<PageResponse<BookSummaryResponse>>> findAll(
             @ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success(PageResponse.of(service.findAll(pageable))));
+    }
+
+    @Operation(summary = "Kitabları dinamik meyarlarla axtarmaq",
+            description = "Title, authorId, categoryId, publisherId, isbn, minPrice/maxPrice, startYear/endYear — bütün parametrlər opsionaldır, yalnız doldurulanlar filtrə daxil edilir")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Axtarış nəticəsi qaytarıldı")
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<PageResponse<BookSummaryResponse>>> search(
+            @ParameterObject BookSearchCriteria criteria,
+            @ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.of(service.search(criteria, pageable))));
     }
 
     @Operation(summary = "Kitabı yeniləmək", description = "Verilən ID-yə uyğun kitabın məlumatlarını yeniləyir")
