@@ -11,3 +11,9 @@ databaseChangeLog:
   - include:
       file: changelogs/0004-create-circulation-schema.yaml
       relativeToChangelogFile: true
+  - include:
+      file: changelogs/0005-add-price-to-books.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changelogs/0006-seed-admin-user.yaml
+      relativeToChangelogFile: true

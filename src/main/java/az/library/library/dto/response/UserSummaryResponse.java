@@ -1,6 +1,6 @@
 package az.library.library.dto.response;
 
-import az.library.library.enums.UserRole;
+import az.library.library.enums.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +23,7 @@ public class UserSummaryResponse {
     @Schema(description = "E-poçt ünvanı", example = "ali@library.az")
     private String email;
 
-    @Schema(description = "İstifadəçi rolu", example = "USER")
-    private UserRole role;
+    @Schema(description = "İstifadəçi rolu", example = "ROLE_USER")
+    private Role role;
 
 }

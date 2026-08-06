@@ -2,12 +2,15 @@ package az.library.library.entity;
 
 import az.library.library.enums.BookStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -62,6 +65,12 @@ public class Book extends BaseEntity {
     @Column(length = 5000)
     @ToString.Include
     private String summary;
+
+    @DecimalMin(value = "0.0", message = "Price must not be negative")
+    @Digits(integer = 8, fraction = 2, message = "Price must not exceed 8 digits and 2 decimal places")
+    @Column(precision = 10, scale = 2)
+    @ToString.Include
+    private BigDecimal price;
 
     @NotNull(message = "Book status is required")
     @Enumerated(EnumType.STRING)

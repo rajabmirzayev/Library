@@ -3,6 +3,7 @@ package az.library.library.dto.response;
 import az.library.library.enums.BookStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -41,6 +42,9 @@ public class BookDetailedResponse {
 
     @Schema(description = "Xülasə")
     private String summary;
+
+    @Schema(description = "Kitabın qiyməti (AZN)", example = "19.99")
+    private BigDecimal price;
 
     @Schema(description = "Kitabın statusu", example = "AVAILABLE")
     private BookStatus status;

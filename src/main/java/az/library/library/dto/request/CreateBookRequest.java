@@ -1,10 +1,13 @@
 package az.library.library.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import lombok.AllArgsConstructor;
@@ -46,6 +49,11 @@ public class CreateBookRequest {
     @Size(max = 5000, message = "Xülasə maksimum 5000 simvoldan ibarət ola bilər")
     @Schema(description = "Kitabın qısa xülasəsi")
     private String summary;
+
+    @DecimalMin(value = "0.0", message = "Qiymət mənfi ola bilməz")
+    @Digits(integer = 8, fraction = 2, message = "Qiymət maksimum 8 tam və 2 kəsr rəqəmdən ibarət ola bilər")
+    @Schema(description = "Kitabın qiyməti (AZN)", example = "19.99")
+    private BigDecimal price;
 
     @Schema(description = "Nəşriyyat ID-si", example = "1")
     private Long publisherId;

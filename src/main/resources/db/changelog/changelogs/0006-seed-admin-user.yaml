@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0006-01-seed-admin-user
+      author: rajabmirzayev
+      description: Seed default admin user (admin/admin123) for Postman/development
+      preConditions:
+        - onFail: MARK_RAN
+          sqlCheck:
+            expectedResult: 0
+            sql: SELECT COUNT(*) FROM users WHERE username = 'admin'
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: email
+                  value: admin@library.az
+              - column:
+                  name: password
+                  value: $2b$10$2mLEjCYwabc4rzAjCl0QYOPiKQ8zTYQa6orU9gx8ndmApA6xApUWm
+              - column:
+                  name: role
+                  value: ROLE_ADMIN
+              - column:
+                  name: created_at
+                  valueComputed: now()
+              - column:
+                  name: updated_at
+                  valueComputed: now()
+              - column:
+                  name: deleted
+                  valueBoolean: false

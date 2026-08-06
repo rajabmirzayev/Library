@@ -1977,6 +1977,188 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Hesabatlar (Reports)",
+      "item": [
+        {
+          "name": "Login Admin",
+          "description": "Admin hesabı ilə daxil olur və alınan JWT token-i `admin_token` environment dəyişəninə yazır. `admin_username` / `admin_password` dəyişənlərini environment-da real admin hesabına uyğunlaşdırın.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var data = pm.response.json();",
+                  "    if (data.success && data.data && data.data.token) {",
+                  "        pm.environment.set('admin_token', data.data.token);",
+                  "        console.log('Admin token captured');",
+                  "    }",
+                  "}",
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Admin token is stored', () => pm.expect(pm.environment.get('admin_token')).to.be.ok);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{admin_username}}\",\n  \"password\": \"{{admin_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Library Overview",
+          "description": "Kitabxananın ümumi statistikası — kitab, nüsxə, üzv, kredit, rezervasiya və cərimə göstəriciləri. (ROLE_ADMIN tələb olunur)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response wrapper is success', () => {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.success).to.eql(true);",
+                  "    pm.expect(body.data).to.exist;",
+                  "});",
+                  "pm.test('Count metrics are present and numeric', () => {",
+                  "    const d = pm.response.json().data;",
+                  "    ['totalBooks','totalCopies','availableCopies','totalMembers','activeLoans','overdueLoans','pendingReservations','pendingFines'].forEach(f => {",
+                  "        pm.expect(d).to.have.property(f).that.is.a('number');",
+                  "    });",
+                  "});",
+                  "pm.test('Available copies cannot exceed total copies', () => {",
+                  "    const d = pm.response.json().data;",
+                  "    pm.expect(d.availableCopies).to.be.at.most(d.totalCopies);",
+                  "});",
+                  "pm.test('Financial aggregates are valid numbers', () => {",
+                  "    const d = pm.response.json().data;",
+                  "    pm.expect(Number(d.collectedFineRevenue)).to.be.a('number');",
+                  "    pm.expect(Number(d.totalFineAmount)).to.be.a('number');",
+                  "    pm.expect(Number(d.collectedFineRevenue)).to.be.at.most(Number(d.totalFineAmount));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/reports/overview",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "reports",
+                "overview"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Most Borrowed Books",
+          "description": "Kredit sayına görə azalan sırada ən çox icarəyə götürülən kitablar. `from`/`to` parametrləri (disabled) aktivləşdirilərsə tarix aralığı ilə filtr işləyir. (ROLE_ADMIN tələb olunur)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns a list not exceeding the limit', () => {",
+                  "    const d = pm.response.json().data;",
+                  "    pm.expect(d).to.be.an('array');",
+                  "    pm.expect(d.length).to.be.at.most(5);",
+                  "});",
+                  "pm.test('Every row has the required fields', () => {",
+                  "    pm.response.json().data.forEach(row => {",
+                  "        pm.expect(row).to.have.property('bookId');",
+                  "        pm.expect(row.bookTitle).to.be.a('string');",
+                  "        pm.expect(row).to.have.property('isbn');",
+                  "        pm.expect(row.borrowCount).to.be.a('number');",
+                  "        pm.expect(row.authorNames).to.be.a('string');",
+                  "    });",
+                  "});",
+                  "pm.test('Rows are sorted by borrowCount descending', () => {",
+                  "    const counts = pm.response.json().data.map(r => r.borrowCount);",
+                  "    for (let i = 1; i < counts.length; i++) {",
+                  "        pm.expect(counts[i]).to.be.at.most(counts[i - 1]);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/{{api_version}}/reports/most-borrowed-books?limit=5",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "{{api_version}}",
+                "reports",
+                "most-borrowed-books"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5",
+                  "description": "Nəticə sayı"
+                },
+                {
+                  "key": "from",
+                  "value": "2026-01-01",
+                  "disabled": true,
+                  "description": "Başlanğıc tarix (daxil)"
+                },
+                {
+                  "key": "to",
+                  "value": "2026-12-31",
+                  "disabled": true,
+                  "description": "Son tarix (daxil deyil)"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

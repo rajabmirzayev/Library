@@ -79,6 +79,7 @@ public class BookServiceImpl implements BookService {
         if (request.getPageCount() != null) book.setPageCount(request.getPageCount());
         if (request.getLanguage() != null) book.setLanguage(request.getLanguage());
         if (request.getSummary() != null) book.setSummary(request.getSummary());
+        if (request.getPrice() != null) book.setPrice(request.getPrice());
         if (request.getPublisherId() != null) {
             if (request.getPublisherId() == 0) book.setPublisher(null);
             else book.setPublisher(publisherRepository.findById(request.getPublisherId())

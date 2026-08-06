@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0005-01-add-price-to-books
+      author: rajabmirzayev
+      description: Add price column to books table for price range filtering
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            columnExists:
+              tableName: books
+              columnName: price
+      changes:
+        - addColumn:
+            tableName: books
+            columns:
+              - column:
+                  name: price
+                  type: decimal(10,2)
+                  remarks: Book selling price

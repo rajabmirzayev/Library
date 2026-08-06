@@ -1,9 +1,11 @@
 package az.library.library.mapper;
 
+import az.library.library.dto.request.CreateUserRequest;
+import az.library.library.dto.request.UpdateUserRequest;
 import az.library.library.dto.response.UserDetailedResponse;
 import az.library.library.dto.response.UserSummaryResponse;
 import az.library.library.entity.User;
-import az.library.library.enums.UserRole;
+import az.library.library.enums.Role;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
@@ -30,8 +32,16 @@ public interface UserMapper {
     UserSummaryResponse toSummaryResponse(User user);
 
     @Named("mapRole")
-    default UserRole mapRole(String role) {
-        return role == null ? UserRole.USER : UserRole.valueOf(role.toUpperCase());
+    default Role mapRole(String role) {
+        if (role == null || role.isBlank()) {
+            return Role.ROLE_USER;
+        }
+        String normalized = role.toUpperCase().startsWith("ROLE_") ? role.toUpperCase() : "ROLE_" + role.toUpperCase();
+        try {
+            return Role.valueOf(normalized);
+        } catch (IllegalArgumentException e) {
+            return Role.ROLE_USER;
+        }
     }
 
 }

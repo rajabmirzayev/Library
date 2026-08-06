@@ -1,8 +1,11 @@
 package az.library.library.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import lombok.AllArgsConstructor;
@@ -42,6 +45,11 @@ public class UpdateBookRequest {
     @Size(max = 5000, message = "Xülasə maksimum 5000 simvoldan ibarət ola bilər")
     @Schema(description = "Yeni xülasə")
     private String summary;
+
+    @DecimalMin(value = "0.0", message = "Qiymət mənfi ola bilməz")
+    @Digits(integer = 8, fraction = 2, message = "Qiymət maksimum 8 tam və 2 kəsr rəqəmdən ibarət ola bilər")
+    @Schema(description = "Yeni qiymət (AZN)", example = "24.99")
+    private BigDecimal price;
 
     @Schema(description = "Yeni nəşriyyat ID-si (0 = nəşriyyatı sil)", example = "1")
     private Long publisherId;
