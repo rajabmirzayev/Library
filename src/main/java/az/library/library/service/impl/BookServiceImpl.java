@@ -57,7 +57,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDetailedResponse findById(Long id) {
-        return bookMapper.toDetailedResponse(bookRepository.findById(id)
+        return bookMapper.toDetailedResponse(bookRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book", id)));
     }
 
@@ -75,7 +75,7 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public BookDetailedResponse update(Long id, UpdateBookRequest request) {
-        Book book = bookRepository.findById(id)
+        Book book = bookRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book", id));
         if (request.getTitle() != null) book.setTitle(request.getTitle());
         if (request.getIsbn() != null) {
