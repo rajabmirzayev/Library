@@ -1,6 +1,6 @@
 # Library Management System
 
-Spring Boot 4.1.0 ilə hazırlanmış kitabxana idarəetmə sistemi. CRUD əməliyyatları, səhifələmə, giriş validasiyası, Swagger/OpenAPI sənədləşdirilməsi və Postman test kolleksiyaları daxildir.
+Spring Boot 4.1.0 ilə hazırlanmış kitabxana idarəetmə sistemi. JPA Specification API ilə dinamik axtarış, Liquibase migration, `rollbackFor` ilə atomik tranzaksiyalar, JOIN FETCH / @EntityGraph ilə N+1 optimizasiyası, native SQL hesabatlar, JWT əsaslı RBAC, inteqrasiya testləri və Postman kolleksiyaları daxildir.
 
 ## Tech Stack
 
@@ -10,8 +10,11 @@ Spring Boot 4.1.0 ilə hazırlanmış kitabxana idarəetmə sistemi. CRUD əməl
 | Spring Boot | 4.1.0 |
 | PostgreSQL | 17 |
 | Hibernate | 7.4.1 |
+| Liquibase | 5.0.3 |
 | MapStruct | 1.6.3 |
+| Spring Security + JWT (jjwt) | 0.12.6 |
 | SpringDoc OpenAPI | 2.8.6 |
+| H2 (test) | Latest |
 | Lombok | Latest |
 | JUnit 5 + Mockito | Latest |
 
@@ -43,11 +46,10 @@ docker compose up -d --build
 ```
 
 Bu əmr:
-- PostgreSQL verilənlər bazasını Docker container-daaldırır
+- PostgreSQL verilənlər bazasını Docker container-da qaldırır
 - Spring Boot tətbiqini build edib işə salır
-- Baza schemanı avtomatik yaradır (`ddl-auto: update`)
-
-> Daha sonrakı həftələrdə bunu Liquibase ilə əvəzləyəcəm
+- Liquibase ilə bütün migration-ları tətbiq edir (`ddl-auto: validate`)
+- `admin` / `admin123` istifadəçisi avtomatik seed olunur (ROLE_ADMIN)
 
 ### 4. Tətbiqi yoxlayın
 
@@ -94,7 +96,10 @@ cp .env.example .env
 | `DB_PORT` | Baza portu | `5432` |
 | `DB_USERNAME` | Tətbiq istifadəçisi | `postgres` |
 | `DB_PASSWORD` | Tətbiq şifrəsi | `postgres` |
-| `JPA_DDL_AUTO` | Hibernate schema rejimi | `update` |
+| `JPA_DDL_AUTO` | Hibernate schema rejimi | `validate` |
+| `JWT_SECRET` | JWT imza açarı (base64) | *(tələb olunur)* |
+| `JWT_EXPIRATION_MS` | JWT müddəti (ms) | `86400000` |
+| `LIQUIBASE_ENABLED` | Liquibase aktiv/passiv | `true` |
 
 ## API Endpoint-lər
 
@@ -102,36 +107,42 @@ Bütün endpoint-lər `/api/v1` prefiksi ilə başlayır.
 
 | Resurs | Endpoint | Əməliyyatlar |
 |--------|----------|-------------|
+| Auth | `/auth/register`, `/auth/login` | Register, Login |
 | Müəlliflər | `/authors` | CRUD |
 | Nəşriyyatlar | `/publishers` | CRUD |
 | Kategoriyalar | `/categories` | CRUD |
 | Üzvlər | `/members` | CRUD |
-| Kitablar | `/books` | CRUD |
+| Kitablar | `/books`, `/books/search` | CRUD + Dinamik axtarış |
 | Kitab Nüsxələri | `/book-copies` | CRUD |
 | Borclanmalar | `/loans` | CRUD |
 | Cərimələr | `/fines` | CRUD |
 | Rezervasiyalar | `/reservations` | CRUD |
+| Hesabatlar | `/reports/overview`, `/reports/most-borrowed-books` | Admin analitika (ROLE_ADMIN) |
 
 ## Layihə Strukturu
 
 ```
 src/main/java/az/library/library/
-├── config/           # OpenAPI konfiqurasiyası
+├── config/           # Liquibase BeanPostProcessor, OpenAPI konfiqurasiyası
 ├── controller/       # REST controller-lər
 ├── dto/
-│   ├── request/      # Create/Update request DTO-ları
-│   └── response/     # Response DTO-ları + PageResponse
+│   ├── request/      # Create/Update/Search request DTO-ları
+│   └── response/     # Response DTO-ları + PageResponse + ApiResponse
 ├── entity/           # JPA entity-ləri
 ├── enums/            # Status və tip enumları
 ├── exception/        # ResourceNotFoundException, GlobalExceptionHandler
 ├── mapper/           # MapStruct mapper interfeysləri
-├── repository/       # Spring Data JPA repository-ləri
-└── service/
-    ├── impl/         # Service implementasiyaları
-    └── *.java        # Service interfeysləri
+├── repository/
+│   └── specification/ # JPA Specification (BookSpecification)
+├── security/         # JWT filter, JwtService, SecurityConfig
+├── service/
+│   ├── impl/         # Service implementasiyaları
+│   └── *.java        # Service interfeysləri
+└── utils/            # Köməkçi util siniflər
 
 src/test/java/az/library/library/
-└── service/impl/     # JUnit 5 + Mockito testləri (100 test)
+├── service/impl/     # Mockito unit testləri + inteqrasiya testi
+└── LibraryApplicationTests.java
 ```
 
 ## Testlər
@@ -140,25 +151,27 @@ src/test/java/az/library/library/
 # Bütün testləri çalışdırın
 ./gradlew test
 
-# Yalnız service testləri
-./gradlew test --tests "az.library.library.service.impl.*"
+# Yalnız inteqrasiya testləri
+./gradlew test --tests "*TransactionRollbackIntegrationTest"
+
+# Yalnız unit testlər
+./gradlew test --tests "az.library.library.service.impl.*" --exclude-task test
 ```
 
-## Postman Kolleksiyaları
+**108 test** (101 unit + 7 inteqrasiya). İnteqrasiya testləri H2 (PostgreSQL mode) bazasında işləyir — Docker/PostgreSQL tələb olunmur.
 
-`postman/` qovluğunda iki kolleksiya var:
+## Postman Kolleksiyası
 
-| Kolleksiya | Təsvir |
-|-----------|--------|
-| `Library-API.postman_collection.json` | Əsas CRUD əməliyyatları (45 request) |
-| `Library-KPI-Collection.postman_collection.json` | KPI testləri: validasiya, 404, pagination, response time (74 request) |
-| `Library-Local.postman_environment.json` | Yerli development environment dəyişənləri |
+| Fayl | Təsvir |
+|------|--------|
+| `Library-API.postman_collection.json` | Əsas CRUD + Search Books + Hesabatlar + Auth + Admin (50+ request) |
+| `Library-Environment.postman_environment.json` | Environment dəyişənləri (base_url, token, admin credentials) |
 
 **İstifadə:**
 1. Postman-i açın
-2. `Library-Local.postman_environment.json` import edin
-3. Kolleksiyanı import edin
-4. Health Check qovluğunu çalışdırın
-5. Sonra CRUD endpoint-lərini test edin
+2. `Library-Environment.postman_environment.json` import edin (environment seçin)
+3. `Library-API.postman_collection.json` import edin
+4. Auth → Register → Login (token avtomatik `token` env dəyişəninə yazılır)
+5. Hesabatlar üçün: Hesabatlar → Login Admin → `admin_token` avtomatik yazılır
 
 

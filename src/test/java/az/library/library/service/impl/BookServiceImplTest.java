@@ -150,7 +150,7 @@ class BookServiceImplTest {
         BookDetailedResponse response = new BookDetailedResponse();
         response.setId(id);
 
-        given(bookRepository.findById(id)).willReturn(Optional.of(entity));
+        given(bookRepository.findByIdWithDetails(id)).willReturn(Optional.of(entity));
         given(bookMapper.toDetailedResponse(entity)).willReturn(response);
 
         BookDetailedResponse result = service.findById(id);
@@ -162,7 +162,7 @@ class BookServiceImplTest {
     @Test
     void Given_NonExistingId_When_FindById_Then_ThrowsResourceNotFoundException() {
         Long id = 999L;
-        given(bookRepository.findById(id)).willReturn(Optional.empty());
+        given(bookRepository.findByIdWithDetails(id)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -195,7 +195,7 @@ class BookServiceImplTest {
         BookDetailedResponse response = new BookDetailedResponse();
         response.setId(id);
 
-        given(bookRepository.findById(id)).willReturn(Optional.of(entity));
+        given(bookRepository.findByIdWithDetails(id)).willReturn(Optional.of(entity));
         given(bookRepository.save(any(Book.class))).willReturn(entity);
         given(bookMapper.toDetailedResponse(entity)).willReturn(response);
 
@@ -212,7 +212,7 @@ class BookServiceImplTest {
         request.setIsbn("978-0-00-000000-1");
 
         Book entity = Book.builder().id(id).isbn("978-0-13-468599-1").build();
-        given(bookRepository.findById(id)).willReturn(Optional.of(entity));
+        given(bookRepository.findByIdWithDetails(id)).willReturn(Optional.of(entity));
         given(bookRepository.existsByIsbn("978-0-00-000000-1")).willReturn(true);
 
         assertThatThrownBy(() -> service.update(id, request))
@@ -230,7 +230,7 @@ class BookServiceImplTest {
         BookDetailedResponse response = new BookDetailedResponse();
         response.setId(id);
 
-        given(bookRepository.findById(id)).willReturn(Optional.of(entity));
+        given(bookRepository.findByIdWithDetails(id)).willReturn(Optional.of(entity));
         given(bookRepository.save(any(Book.class))).willReturn(entity);
         given(bookMapper.toDetailedResponse(entity)).willReturn(response);
 
@@ -250,7 +250,7 @@ class BookServiceImplTest {
         Book entity = Book.builder().id(id).publisher(publisher).build();
         BookDetailedResponse response = new BookDetailedResponse();
 
-        given(bookRepository.findById(id)).willReturn(Optional.of(entity));
+        given(bookRepository.findByIdWithDetails(id)).willReturn(Optional.of(entity));
         given(bookRepository.save(any(Book.class))).willReturn(entity);
         given(bookMapper.toDetailedResponse(entity)).willReturn(response);
 
@@ -266,7 +266,7 @@ class BookServiceImplTest {
     void Given_NonExistingId_When_Update_Then_ThrowsResourceNotFoundException() {
         Long id = 999L;
         UpdateBookRequest request = new UpdateBookRequest();
-        given(bookRepository.findById(id)).willReturn(Optional.empty());
+        given(bookRepository.findByIdWithDetails(id)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(id, request))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -283,7 +283,7 @@ class BookServiceImplTest {
         Book entity = Book.builder().id(id).categories(new HashSet<>(Set.of(cat))).build();
         BookDetailedResponse response = new BookDetailedResponse();
 
-        given(bookRepository.findById(id)).willReturn(Optional.of(entity));
+        given(bookRepository.findByIdWithDetails(id)).willReturn(Optional.of(entity));
         given(bookRepository.save(any(Book.class))).willReturn(entity);
         given(bookMapper.toDetailedResponse(entity)).willReturn(response);
 
